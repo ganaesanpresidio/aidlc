@@ -1,0 +1,27 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code: personal settings and memory stay local
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Secrets and env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Tooling
+node_modules/
+.markdownlint-cli2-cache/
+
+# Office lock / temp files
+~$*
+*.tmp

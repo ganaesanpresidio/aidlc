@@ -1,0 +1,8 @@
+* text=auto eol=lf
+*.md   text diff=markdown
+*.json text
+*.sh   text eol=lf
+*.pptx binary
+*.png  binary
+*.jpg  binary
+*.pdf  binary
