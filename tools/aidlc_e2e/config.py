@@ -11,7 +11,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-ENV_FILE = PROJECT_ROOT / ".env"
+# Pick another file with AIDLC_ENV_FILE (e.g. env.dev); relative paths are from the repo root.
+ENV_FILE = PROJECT_ROOT / os.environ.get("AIDLC_ENV_FILE", ".env")
 
 
 def load_env_file(path: Path = ENV_FILE) -> dict[str, str]:
@@ -48,6 +49,7 @@ class JiraSettings:
     epic_key: str
     email: str
     api_token: str
+    confluence_space_key: str = ""
 
     def missing(self) -> list[str]:
         """Names of the settings needed to reach the Jira project that are still empty."""
@@ -67,6 +69,7 @@ class JiraSettings:
             "JIRA_EPIC_KEY": self.epic_key,
             "JIRA_EMAIL": self.email,
             "JIRA_API_TOKEN": "set" if self.api_token else "",
+            "CONFLUENCE_SPACE_KEY": self.confluence_space_key,
         }
 
 
@@ -79,4 +82,5 @@ def jira_settings(env_file: Path = ENV_FILE) -> JiraSettings:
         epic_key=get("JIRA_EPIC_KEY", "", env_file),
         email=get("JIRA_EMAIL", "", env_file),
         api_token=get("JIRA_API_TOKEN", "", env_file),
+        confluence_space_key=get("CONFLUENCE_SPACE_KEY", "", env_file),
     )

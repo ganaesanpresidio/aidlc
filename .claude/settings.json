@@ -4,6 +4,7 @@
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
+      "Read(./env.dev)",
       "Read(./**/*.pem)",
       "Read(./**/*.key)"
     ]

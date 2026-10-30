@@ -19,6 +19,8 @@ CLAUDE.local.md
 .env
 .env.*
 !.env.example
+env.*
+!env.example
 *.pem
 *.key
 *.p12
