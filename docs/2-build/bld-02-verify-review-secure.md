@@ -6,8 +6,8 @@ phase_focus: How
 sequence: 6 of 8
 actors: [Engineer, Test (on demand)]
 status: Draft
-version: 1.0.0
-last_updated: 2026-10-29
+version: 1.1.0
+last_updated: 2026-10-30
 source: AI-DLC_usercase_for_ExpenseManagement_V1.0.pptx, slide 2, row 6
 previous: BLD-01
 next: DEP-01
@@ -24,7 +24,7 @@ next: DEP-01
 | Phase | Build · How |
 | Actor (role) | Engineer + Test (on demand) |
 | Tools & agents | Claude Code, Playwright, SAST scanners |
-| Skills | GS `/review`, `/qa`, `/cso` · AO `code-review-and-quality` |
+| Skills | GS `/review`, `/qa`, `/cso` · AO `code-review-and-quality` · MP `/mattpocock-skills:code-review` |
 | Workflow | Two-axis review: spec match + standards; UAT packs |
 | Hooks | `PreToolUse`: block commit on failing tests or PII |
 | Entry gate | Bolt accepted in BLD-01; PR open |
@@ -105,6 +105,7 @@ Do not edit files.
 | --- | --- | --- | --- |
 | `/review` | GS · gstack | On every PR, first pass | Review findings |
 | `code-review-and-quality` | AO · Addy Osmani | Standards axis, deeper pass | Graded findings + fixes |
+| `/mattpocock-skills:code-review` | MP · Matt Pocock | Both axes at once: Standards and Spec, run side by side | Two-column review report |
 | `/qa` | GS · gstack | After review fixes, to test the running app | QA report, Playwright tests |
 | `/cso` | GS · gstack | Security review of money, approval and PII paths | Security findings + threat notes |
 
@@ -112,7 +113,7 @@ Do not edit files.
 
 **Flow:** Two-axis review: spec match + standards; UAT packs
 
-1. **Axis 1 — spec match** · `spec-reviewer` · Diff vs LLD and acceptance criteria.
+1. **Axis 1 — spec match** · `spec-reviewer` (or `/mattpocock-skills:code-review`, which runs both axes) · Diff vs LLD and acceptance criteria.
 2. **Axis 2 — standards** · Claude (`/review`, `code-review-and-quality`) + `standards-reviewer`.
 3. **Security** · Claude (`/cso`) + SAST scanners · Focus: authZ, SoD, payout idempotency, PII, secrets.
 4. **Fix** · Engineer + Claude · Fix Critical/High findings; log accepted risks with a reason.
@@ -239,3 +240,4 @@ L1 approve, L2 approve above threshold, reject with reason, self-approval attemp
 | Version | Date | Author | Change |
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-10-29 | AI-DLC team | First version from slide 2, row 6 |
+| 1.1.0 | 2026-10-30 | AI-DLC team | Skill names updated to installed versions (MP 1.3.2, AO 0.6.14) |

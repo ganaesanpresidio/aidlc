@@ -6,8 +6,8 @@ phase_focus: What & why
 sequence: 4 of 8
 actors: [Architect, Engineer]
 status: Draft
-version: 1.0.0
-last_updated: 2026-10-29
+version: 1.1.0
+last_updated: 2026-10-30
 source: AI-DLC_usercase_for_ExpenseManagement_V1.0.pptx, slide 2, row 4
 previous: DIS-03
 next: BLD-01
@@ -24,7 +24,7 @@ next: BLD-01
 | Phase | Discover · What & why |
 | Actor (role) | Architect + Engineer |
 | Tools & agents | Claude Code plan mode, AWS Diagram MCP |
-| Skills | GS `/plan-eng-review` · AO `/spec`, `/plan` |
+| Skills | GS `/plan-eng-review` · AO `/agent-skills:spec`, `/agent-skills:plan` |
 | Workflow | HLD → LLD (APIs, data, sequence) → design review |
 | Hooks | `PreToolUse`: no build until LLD approved |
 | Entry gate | DIS-03 units + NFRs approved |
@@ -90,8 +90,8 @@ Rules:
 
 | Skill | Library | When to invoke | Expected output |
 | --- | --- | --- | --- |
-| `/spec` | AO · Addy Osmani | Start of each unit: turn the unit file into a precise spec | `aidlc-docs/design/<unit>/spec.md` |
-| `/plan` | AO · Addy Osmani | After spec: break the unit into bolts and tasks | `aidlc-docs/design/<unit>/plan.md` |
+| `/agent-skills:spec` | AO · Addy Osmani | Start of each unit: turn the unit file into a precise spec | `aidlc-docs/design/<unit>/spec.md` |
+| `/agent-skills:plan` | AO · Addy Osmani | After spec: break the unit into bolts and tasks | `aidlc-docs/design/<unit>/plan.md` |
 | `/plan-eng-review` | GS · gstack | Before human review: AI engineering review of the design | Review findings list |
 
 ## 6. Workflow
@@ -99,9 +99,9 @@ Rules:
 **Flow:** HLD → LLD (APIs, data, sequence) → design review
 
 1. **HLD** · Architect + Claude (plan mode, AWS Diagram MCP) · Platform context, AWS architecture (API Gateway, Lambda/containers, Step Functions, Textract, data stores), security zones. Output: `aidlc-docs/design/hld.md`.
-2. **Spec per unit** · `solution-designer` (`/spec`) · One run per unit, in parallel.
+2. **Spec per unit** · `solution-designer` (`/agent-skills:spec`) · One run per unit, in parallel.
 3. **LLD per unit** · `solution-designer` · APIs, events, data model, sequences (e.g. *submit → OCR → policy check → route to approver*).
-4. **Plan per unit** · Claude (`/plan`) · Bolts and tasks, each small enough for one bolt.
+4. **Plan per unit** · Claude (`/agent-skills:plan`) · Bolts and tasks, each small enough for one bolt.
 5. **AI engineering review** · Claude (`/plan-eng-review`) · Findings on coupling, failure modes, NFR gaps, test gaps.
 6. **Design review** · Architect + Engineer (+ FED for UX units) · Accept, change or reject each finding; update LLD.
 7. **Client approval** · Solution Owner / client · Review the design document (publish to Confluence if needed).
@@ -182,7 +182,7 @@ Use AWS Diagram MCP for the architecture diagram. Show me options before writing
 ```
 
 ```text
-Run the solution-designer agent for unit "policy": /spec then LLD, then /plan.
+Run the solution-designer agent for unit "policy": /agent-skills:spec then LLD, then /agent-skills:plan.
 Map every NFR in nfr-matrix.md to a design element.
 ```
 
@@ -218,3 +218,4 @@ Map every NFR in nfr-matrix.md to a design element.
 | Version | Date | Author | Change |
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-10-29 | AI-DLC team | First version from slide 2, row 4 |
+| 1.1.0 | 2026-10-30 | AI-DLC team | Skill names updated to installed versions (MP 1.3.2, AO 0.6.14) |

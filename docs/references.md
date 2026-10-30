@@ -2,8 +2,8 @@
 id: REF-00
 title: References — Method, Skills, Agents and Tools
 status: Draft
-version: 1.0.0
-last_updated: 2026-10-29
+version: 1.1.0
+last_updated: 2026-10-30
 source: AI-DLC_usercase_for_ExpenseManagement_V1.0.pptx, slide 3 (addresses as of 28 Oct 2026)
 ---
 
@@ -25,11 +25,33 @@ Every name used in the activity files, with its web address.
 
 | Reference | What it gives | Link |
 | --- | --- | --- |
-| MP · Matt Pocock skills | `grill-me`, `to-prd`, `grill-with-docs`, `ubiquitous-language`, `tdd`, `diagnose` | <https://github.com/mattpocock/skills> |
-| AO · Addy Osmani agent-skills | `/spec`, `/plan`, `/build`, `/ship`, `api-and-interface-design`, `frontend-ui-engineering`, `code-review-and-quality` | <https://github.com/addyosmani/agent-skills> |
+| MP · Matt Pocock skills | `/grill-me`, `/to-spec`, `/to-tickets`, `/grill-with-docs`, `domain-modeling`, `tdd`, `diagnosing-bugs`, `/mattpocock-skills:code-review` | <https://github.com/mattpocock/skills> |
+| AO · Addy Osmani agent-skills | `/agent-skills:spec`, `/agent-skills:plan`, `/agent-skills:build`, `/agent-skills:ship`, `api-and-interface-design`, `frontend-ui-engineering`, `code-review-and-quality` | <https://github.com/addyosmani/agent-skills> |
 | GS · gstack (Garry Tan) | `/office-hours`, `/autoplan`, `/plan-eng-review`, `/review`, `/qa`, `/cso`, `/ship`, `/land-and-deploy`, `/canary`, `/investigate`, `/retro` | <https://github.com/garrytan/gstack> |
 
-> Skill names change between library versions. Pin the version you install and check names with `/help` in Claude Code.
+### Installed versions
+
+| Library | Version | Installed as |
+| --- | --- | --- |
+| MP · Matt Pocock skills | 1.3.2 | Claude Code plugin `mattpocock-skills@mattpocock` |
+| AO · Addy Osmani agent-skills | 0.6.14 | Claude Code plugin `agent-skills@addy-agent-skills` |
+| GS · gstack | main branch (names checked 2026-10-30) | `~/.claude/skills/gstack` (clone + `./setup`) |
+
+### Names changed from the original deck
+
+| Deck name | Use now | Why |
+| --- | --- | --- |
+| MP `to-prd` | `/to-spec` | Renamed in MP skills; `/to-tickets` now splits the spec into stories |
+| MP `ubiquitous-language` | `domain-modeling` | Renamed in MP skills (also maintains the glossary and ADRs) |
+| MP `diagnose` | `diagnosing-bugs` | Renamed in MP skills |
+| AO `/spec`, `/plan`, `/build`, `/ship` | `/agent-skills:spec`, `/agent-skills:plan`, `/agent-skills:build`, `/agent-skills:ship` | gstack also has `/spec` and `/ship`, and Claude Code has built-in `/plan` and `/review`; the full name always picks Addy Osmani's version |
+
+### How to invoke
+
+- A name starting with `/` is typed as a command. MP's `grill-me`, `grill-with-docs`, `to-spec` and `to-tickets` work **only** this way.
+- A name without `/` (e.g. `domain-modeling`, `tdd`, `code-review-and-quality`) is used by Claude automatically when the task fits. You can also ask for it by name.
+- Use the full `<plugin>:<skill>` form whenever two libraries share a name.
+- Pin library versions. After an upgrade, re-check names with `/help` and update this table.
 
 ## Tools, MCP and AWS
 
@@ -46,3 +68,4 @@ Every name used in the activity files, with its web address.
 | Version | Date | Author | Change |
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-10-29 | AI-DLC team | First version from slide 3 |
+| 1.1.0 | 2026-10-30 | AI-DLC team | Installed versions, renamed skills and how to invoke them |

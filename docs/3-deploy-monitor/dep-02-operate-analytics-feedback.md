@@ -6,8 +6,8 @@ phase_focus: Run & learn
 sequence: 8 of 8
 actors: [Solution Owner, Engineer]
 status: Draft
-version: 1.0.0
-last_updated: 2026-10-29
+version: 1.1.0
+last_updated: 2026-10-30
 source: AI-DLC_usercase_for_ExpenseManagement_V1.0.pptx, slide 2, row 8
 previous: DEP-01
 next: DIS-01 (next Inception cycle)
@@ -24,7 +24,7 @@ next: DIS-01 (next Inception cycle)
 | Phase | Deploy & Monitor · Run & learn |
 | Actor (role) | Solution Owner + Engineer |
 | Tools & agents | Amazon CloudWatch, Amazon QuickSight, Claude analytics agent |
-| Skills | GS `/investigate`, `/retro` · MP `diagnose` |
+| Skills | GS `/investigate`, `/retro` · MP `diagnosing-bugs` |
 | Workflow | Prod & finance signals → next Inception intent |
 | Hooks | `Notification`: SLA breach or policy drift |
 | Entry gate | DEP-01 release live and healthy |
@@ -104,7 +104,7 @@ Rules:
 | Skill | Library | When to invoke | Expected output |
 | --- | --- | --- | --- |
 | `/investigate` | GS · gstack | On an alarm or incident | Root-cause analysis with evidence |
-| `diagnose` | MP · Matt Pocock | For hard bugs found in prod: reproduce, isolate, fix | Fix with a regression test |
+| `diagnosing-bugs` | MP · Matt Pocock | For hard bugs found in prod: reproduce, isolate, fix (replaces the older `diagnose`) | Fix with a regression test |
 | `/retro` | GS · gstack | End of each release / cycle | Retro: what worked, what to change |
 
 ## 6. Workflow
@@ -114,7 +114,7 @@ Rules:
 1. **Monitor** · CloudWatch + QuickSight · Ops signals (latency, errors, OCR failures, approval SLA) and finance signals (time-to-pay, spend, breaches).
 2. **Alert** · CloudWatch alarm → SNS → on-call. Claude Code's `Notification` hook forwards Claude's own alerts to the same channel.
 3. **Investigate** · Engineer + `incident-investigator` (`/investigate`) · Root cause with evidence.
-4. **Fix** · Engineer + Claude (`diagnose`) · Fix with regression test; goes back through BLD-01 → BLD-02 → DEP-01.
+4. **Fix** · Engineer + Claude (`diagnosing-bugs`) · Fix with regression test; goes back through BLD-01 → BLD-02 → DEP-01.
 5. **Analyse spend** · `spend-analytics` (weekly) · Reimbursement times, breaches by team/category, policy drift.
 6. **Retro** · Team + Claude (`/retro`) · Per release: delivery, quality, AI usage, gate effectiveness.
 7. **Draft next intent** · Claude · From incidents, insights and retro, draft `aidlc-docs/operations/next-intent.md`.
@@ -229,3 +229,4 @@ with rules config v<n>. Flag drift with numbers. Aggregated data only.
 | Version | Date | Author | Change |
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-10-29 | AI-DLC team | First version from slide 2, row 8 |
+| 1.1.0 | 2026-10-30 | AI-DLC team | Skill names updated to installed versions (MP 1.3.2, AO 0.6.14) |

@@ -6,8 +6,8 @@ phase_focus: Run & learn
 sequence: 7 of 8
 actors: [Engineer, Architect]
 status: Draft
-version: 1.0.0
-last_updated: 2026-10-29
+version: 1.1.0
+last_updated: 2026-10-30
 source: AI-DLC_usercase_for_ExpenseManagement_V1.0.pptx, slide 2, row 7
 previous: BLD-02
 next: DEP-02
@@ -24,7 +24,7 @@ next: DEP-02
 | Phase | Deploy & Monitor · Run & learn |
 | Actor (role) | Engineer + Architect |
 | Tools & agents | AWS CDK, AWS CodePipeline, GitHub Actions |
-| Skills | GS `/ship`, `/land-and-deploy`, `/canary` · AO `/ship` |
+| Skills | GS `/ship`, `/land-and-deploy`, `/canary` · AO `/agent-skills:ship` |
 | Workflow | Operations: IaC, deploy, observability set-up |
 | Hooks | `PreToolUse`: prod deploy needs human OK |
 | Entry gate | BLD-02 passed: PR approved, UAT pack signed |
@@ -94,7 +94,7 @@ Rules:
 
 | Skill | Library | When to invoke | Expected output |
 | --- | --- | --- | --- |
-| `/ship` | AO · Addy Osmani | Prepare the release: checklist, notes, version | Release checklist + notes |
+| `/agent-skills:ship` | AO · Addy Osmani | Prepare the release: checklist, notes, version | Release checklist + notes |
 | `/ship` | GS · gstack | Merge-ready check and PR landing | Shipped PR |
 | `/land-and-deploy` | GS · gstack | Land the PR and drive the non-prod deploy | Deployed to dev/staging |
 | `/canary` | GS · gstack | During prod traffic shift, watch health signals | Go / rollback recommendation |
@@ -106,7 +106,7 @@ Rules:
 1. **Draft IaC** · `release-engineer` · CDK stacks per unit; run `cdk synth` and `cdk-nag`.
 2. **Review IaC** · Architect · Review `cdk diff`, IAM and encryption. Fix findings.
 3. **Observability** · `release-engineer` · Dashboards, alarms per NFR (p95 latency, error rate, OCR failure rate, approval SLA, payout failures).
-4. **Release prep** · Claude (`/ship`) · Version, release notes, checklist, rollback steps.
+4. **Release prep** · Claude (`/agent-skills:ship`) · Version, release notes, checklist, rollback steps.
 5. **Non-prod deploy** · Claude (`/land-and-deploy`) · Dev → staging; smoke + Playwright suite on staging.
 6. **HUMAN GATE — prod approval** · Architect + Solution Owner approve in CodePipeline's manual approval action. Claude cannot approve (see hook).
 7. **Blue/green + canary** · Pipeline · Shift e.g. 10% → 50% → 100% traffic; Claude (`/canary`) watches telemetry and recommends go or rollback.
@@ -231,3 +231,4 @@ between blue and green for 15 minutes and recommend go or rollback with evidence
 | Version | Date | Author | Change |
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-10-29 | AI-DLC team | First version from slide 2, row 7 |
+| 1.1.0 | 2026-10-30 | AI-DLC team | Skill names updated to installed versions (MP 1.3.2, AO 0.6.14) |

@@ -6,8 +6,8 @@ phase_focus: What & why
 sequence: 2 of 8
 actors: [Solution Owner, Architect]
 status: Draft
-version: 1.0.0
-last_updated: 2026-10-29
+version: 1.1.0
+last_updated: 2026-10-30
 source: AI-DLC_usercase_for_ExpenseManagement_V1.0.pptx, slide 2, row 2
 previous: DIS-01
 next: DIS-03
@@ -24,7 +24,7 @@ next: DIS-03
 | Phase | Discover · What & why |
 | Actor (role) | Solution Owner + Architect |
 | Tools & agents | Claude Code plan mode, Confluence MCP |
-| Skills | MP `grill-with-docs`, `ubiquitous-language` → ADRs |
+| Skills | MP `/grill-with-docs`, `domain-modeling` → ADRs |
 | Workflow | Rules as config: tiers per team/role, limits |
 | Hooks | `PreToolUse`: no code writes before spec sign-off |
 | Entry gate | DIS-01 PRD and stories signed off |
@@ -93,8 +93,8 @@ Rules:
 
 | Skill | Library | When to invoke | Expected output |
 | --- | --- | --- | --- |
-| `grill-with-docs` | MP · Matt Pocock | Against the policy docs, to find gaps, conflicts and ambiguous limits | Gap list, resolved with the Solution Owner |
-| `ubiquitous-language` | MP · Matt Pocock | After grilling, to fix the shared vocabulary | Updated `policy-glossary.md` |
+| `/grill-with-docs` | MP · Matt Pocock | Against the policy docs, to find gaps, conflicts and ambiguous limits; drafts ADRs and glossary entries as it goes | Gap list, resolved with the Solution Owner |
+| `domain-modeling` | MP · Matt Pocock | After grilling, to fix the shared vocabulary (replaces the older `ubiquitous-language`) | Updated `policy-glossary.md` |
 | ADR authoring | Claude Code (built-in) | For each significant modelling decision | `aidlc-docs/decisions/adr-NNN-*.md` |
 
 ## 6. Workflow
@@ -102,8 +102,8 @@ Rules:
 **Flow:** Rules as config: tiers per team/role, limits
 
 1. **Enter plan mode** · Architect · Claude reads policy pages via Confluence MCP; no file edits yet.
-2. **Grill the policy** · Claude (`grill-with-docs`) + Solution Owner · Find conflicts (e.g. two different meal limits), missing rules (e.g. weekend travel), unclear owners.
-3. **Fix the language** · Claude (`ubiquitous-language`) · Update `aidlc-docs/glossary/policy-glossary.md`; the DIS-01 hook then shares it everywhere.
+2. **Grill the policy** · Claude (`/grill-with-docs`) + Solution Owner · Find conflicts (e.g. two different meal limits), missing rules (e.g. weekend travel), unclear owners.
+3. **Fix the language** · Claude (`domain-modeling`) · Update `aidlc-docs/glossary/policy-glossary.md`; the DIS-01 hook then shares it everywhere.
 4. **Propose the domain model** · `domain-modeler` · Entities, relationships and state machine for a Claim (Draft → Submitted → Approved/Rejected → Paid).
 5. **Design rules as config** · `domain-modeler` · Config schema with: category limits, per-role / per-team tiers, approval thresholds, SoD rules, effective dates and version.
 6. **Record decisions** · Claude + Architect · One ADR per decision (context, options, decision, consequences).
@@ -219,3 +219,4 @@ Write ADRs for the decisions we made today. One file each, status Proposed.
 | Version | Date | Author | Change |
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-10-29 | AI-DLC team | First version from slide 2, row 2 |
+| 1.1.0 | 2026-10-30 | AI-DLC team | Skill names updated to installed versions (MP 1.3.2, AO 0.6.14) |

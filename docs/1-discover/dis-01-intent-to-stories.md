@@ -6,8 +6,8 @@ phase_focus: What & why
 sequence: 1 of 8
 actors: [Solution Owner, BA (on demand)]
 status: Draft
-version: 1.0.0
-last_updated: 2026-10-29
+version: 1.1.0
+last_updated: 2026-10-30
 source: AI-DLC_usercase_for_ExpenseManagement_V1.0.pptx, slide 2, row 1
 previous: none
 next: DIS-02
@@ -24,7 +24,7 @@ next: DIS-02
 | Phase | Discover · What & why |
 | Actor (role) | Solution Owner · BA on demand |
 | Tools & agents | Claude Projects, AWS AI-DLC workflows, Jira MCP |
-| Skills | GS `/office-hours` · `aidlc-workflows` · MP `grill-me`, `to-prd` |
+| Skills | GS `/office-hours` · `aidlc-workflows` · MP `/grill-me`, `/to-spec`, `/to-tickets` |
 | Workflow | Inception: intent → requirements → user stories |
 | Hooks | `UserPromptSubmit`: add policy glossary |
 | Entry gate | A written business intent exists and the Solution Owner is in the session |
@@ -100,8 +100,9 @@ Rules:
 | --- | --- | --- | --- |
 | `/office-hours` | GS · gstack | Start of session, to pressure-test the intent and the "why" | Sharpened problem statement and success measures |
 | `aidlc-workflows` (Inception) | AWS | Main driver of the session | Requirements and stories in AI-DLC format |
-| `grill-me` | MP · Matt Pocock | After the first draft, to surface gaps and edge cases | Question list with answers recorded |
-| `to-prd` | MP · Matt Pocock | When questions are closed | `prd.md` |
+| `/grill-me` | MP · Matt Pocock | After the first draft, to surface gaps and edge cases | Question list with answers recorded |
+| `/to-spec` | MP · Matt Pocock | When questions are closed: turns the session into a spec (replaces the older `to-prd`) | `prd.md` |
+| `/to-tickets` | MP · Matt Pocock | After the PRD: splits it into stories with their dependencies | Story list for Jira |
 
 ## 6. Workflow
 
@@ -110,9 +111,9 @@ Rules:
 1. **Frame the intent** · Solution Owner + Claude (`/office-hours`) · Output: one-paragraph intent and 3–5 success measures (e.g. "95% of claims reimbursed in ≤ 5 days").
 2. **Load context** · Engineer/facilitator · Add the policy doc and glossary to the Claude Project; confirm the `UserPromptSubmit` hook is active.
 3. **Run Inception** · Claude (`aidlc-workflows`) · Claude asks clarifying questions; Solution Owner answers live. Every Q&A is saved to `aidlc-docs/inception/question-log.md`.
-4. **Grill the draft** · Claude (`grill-me`) + BA · Surface edge cases: lost receipts, foreign currency, split bills, delegate approvers, duplicate claims.
-5. **Write the PRD** · Claude (`to-prd`) · Output: `aidlc-docs/inception/prd.md`.
-6. **Generate stories** · `requirements-analyst` · Output: `aidlc-docs/inception/user-stories.md` with acceptance criteria.
+4. **Grill the draft** · Claude (`/grill-me`) + BA · Surface edge cases: lost receipts, foreign currency, split bills, delegate approvers, duplicate claims.
+5. **Write the PRD** · Claude (`/to-spec`) · Output: `aidlc-docs/inception/prd.md`.
+6. **Generate stories** · `requirements-analyst` (`/to-tickets`) · Output: `aidlc-docs/inception/user-stories.md` with acceptance criteria.
 7. **Push to Jira** · Claude via Jira MCP · Stories linked to the epic, labelled `aidlc-discover`.
 8. **HUMAN GATE — sign-off** · Solution Owner reviews PRD and stories, then records approval in `aidlc-docs/approvals/prd-signoff.md`.
 
@@ -221,3 +222,4 @@ Create the stories in Jira under epic <KEY> with label aidlc-discover. Show me t
 | Version | Date | Author | Change |
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-10-29 | AI-DLC team | First version from slide 2, row 1 |
+| 1.1.0 | 2026-10-30 | AI-DLC team | Skill names updated to installed versions (MP 1.3.2, AO 0.6.14) |

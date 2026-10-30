@@ -6,8 +6,8 @@ phase_focus: How
 sequence: 5 of 8
 actors: [Engineer, FED (on demand)]
 status: Draft
-version: 1.0.0
-last_updated: 2026-10-29
+version: 1.1.0
+last_updated: 2026-10-30
 source: AI-DLC_usercase_for_ExpenseManagement_V1.0.pptx, slide 2, row 5
 previous: DIS-04
 next: BLD-02
@@ -24,7 +24,7 @@ next: BLD-02
 | Phase | Build · How |
 | Actor (role) | Engineer · FED on demand |
 | Tools & agents | Claude Code subagents, Amazon Textract, AWS Step Functions |
-| Skills | AO `/build` · MP `tdd` · AO `frontend-ui-engineering` |
+| Skills | AO `/agent-skills:build` · MP `tdd` · AO `frontend-ui-engineering` |
 | Workflow | Mob Construction: code + tests to approved LLD |
 | Hooks | `PostToolUse`: lint, type-check, unit tests |
 | Entry gate | `lld-<unit>.md` approved (DIS-04) |
@@ -99,7 +99,7 @@ Rules:
 
 | Skill | Library | When to invoke | Expected output |
 | --- | --- | --- | --- |
-| `/build` | AO · Addy Osmani | Start of each bolt: implement the next plan task | Code change for one task |
+| `/agent-skills:build` | AO · Addy Osmani | Start of each bolt: implement the next plan task | Code change for one task |
 | `tdd` | MP · Matt Pocock | Inside every bolt: red → green → refactor | Failing test, then passing code |
 | `frontend-ui-engineering` | AO · Addy Osmani | UI bolts with the FED | Accessible, tested UI components |
 
@@ -110,7 +110,7 @@ Rules:
 1. **Pick the bolt** · Engineer · Next task from `plan.md`; confirm scope fits hours to a few days.
 2. **Mob kick-off (10 min)** · Engineer (+ FED/Architect if needed) · Decide trade-offs for this bolt (e.g. sync vs async OCR call, retry policy).
 3. **Red** · `unit-builder` (`tdd`) · Write failing tests from the LLD's acceptance criteria and contracts.
-4. **Green** · `unit-builder` (`/build`) · Minimum code to pass. The `PostToolUse` hook runs lint, type-check and unit tests after each edit and feeds failures back to Claude.
+4. **Green** · `unit-builder` (`/agent-skills:build`) · Minimum code to pass. The `PostToolUse` hook runs lint, type-check and unit tests after each edit and feeds failures back to Claude.
 5. **Refactor** · `unit-builder` · Clean up with tests green.
 6. **Integrate AWS services** · `unit-builder` · Textract and Step Functions behind interfaces; unit tests use fakes, integration tests hit the dev account.
 7. **Review the diff** · Engineer · Read every AI change. Reject anything outside the LLD.
@@ -193,7 +193,7 @@ Follow tdd: show me the failing tests first, then wait for my OK before writing 
 ```
 
 ```text
-/build the next task in aidlc-docs/design/ocr/plan.md. Wrap Textract AnalyzeExpense behind an
+/agent-skills:build the next task in aidlc-docs/design/ocr/plan.md. Wrap Textract AnalyzeExpense behind an
 interface; unit tests use a fake; send results under the confidence threshold to manual review.
 ```
 
@@ -233,3 +233,4 @@ Keyboard-accessible, with loading, empty and error states.
 | Version | Date | Author | Change |
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-10-29 | AI-DLC team | First version from slide 2, row 5 |
+| 1.1.0 | 2026-10-30 | AI-DLC team | Skill names updated to installed versions (MP 1.3.2, AO 0.6.14) |
