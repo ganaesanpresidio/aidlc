@@ -6,7 +6,7 @@ phase_focus: Run & learn
 sequence: 8 of 8
 actors: [Solution Owner, Engineer]
 status: Draft
-version: 1.1.0
+version: 1.2.0
 last_updated: 2026-10-30
 source: AI-DLC_usercase_for_ExpenseManagement_V1.0.pptx, slide 2, row 8
 previous: DEP-01
@@ -154,6 +154,10 @@ Rules:
 # Forwards Claude Code notifications to the team alert channel.
 set -uo pipefail
 MSG=$(jq -r '.message // "Claude Code notification"')
+# Read the webhook from .env if it isn't already set (parsed, not executed).
+if [[ -z "${AIDLC_ALERT_WEBHOOK:-}" && -f "$CLAUDE_PROJECT_DIR/.env" ]]; then
+  AIDLC_ALERT_WEBHOOK=$(grep -E '^AIDLC_ALERT_WEBHOOK=' "$CLAUDE_PROJECT_DIR/.env" | tail -n 1 | cut -d= -f2- | tr -d "\"'")
+fi
 [[ -n "${AIDLC_ALERT_WEBHOOK:-}" ]] || exit 0   # not configured: skip quietly
 curl -sS -m 10 -X POST -H 'Content-Type: application/json' \
   -d "$(jq -n --arg t "[AI-DLC expense] $MSG" '{text:$t}')" \
@@ -161,7 +165,7 @@ curl -sS -m 10 -X POST -H 'Content-Type: application/json' \
 exit 0
 ```
 
-Set `AIDLC_ALERT_WEBHOOK` in your shell or in `.claude/settings.local.json` (`env` block). Never commit the webhook URL.
+Put `AIDLC_ALERT_WEBHOOK` in the git-ignored `.env` file (template: `env.example`), or export it in your shell. Never commit the webhook URL.
 
 ## 8. Outputs and artifacts
 
@@ -230,3 +234,4 @@ with rules config v<n>. Flag drift with numbers. Aggregated data only.
 | --- | --- | --- | --- |
 | 1.0.0 | 2026-10-29 | AI-DLC team | First version from slide 2, row 8 |
 | 1.1.0 | 2026-10-30 | AI-DLC team | Skill names updated to installed versions (MP 1.3.2, AO 0.6.14) |
+| 1.2.0 | 2026-10-30 | AI-DLC team | Alert webhook read from `.env` |

@@ -49,6 +49,8 @@ At a glance · 1 Objective · 2 Roles and responsibilities · 3 Entry criteria �
 ├── .gitignore
 ├── .markdownlint.json
 ├── .python-version           Python version for uv
+├── env.example               Template for the local .env secrets file
+├── aidlc-docs/               Artifacts produced by running the playbook
 ├── pyproject.toml, uv.lock   Python project (uv)
 ├── tools/                    Python helper tools (src/ is reserved for platform units)
 └── docs/
@@ -85,4 +87,5 @@ Suggested `.github/CODEOWNERS` once the repo is on GitHub:
 ## Security
 
 - Never commit secrets, webhook URLs, real PII, receipts or bank/card data.
+- Secrets and local settings go in `.env` (git-ignored). Create it from the template: `cp env.example .env`.
 - Personal Claude settings go in `.claude/settings.local.json` (git-ignored).

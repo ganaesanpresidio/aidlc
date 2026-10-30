@@ -19,7 +19,8 @@ Start here: [docs/00-overview.md](docs/00-overview.md).
 3. **Respect the gates.** No code under `src/` or `infra/` before spec sign-off (DIS-02);
    no `src/<unit>/` code before `lld-<unit>.md` is approved (DIS-04). Never deploy to prod.
 4. **Ask before guessing.** Unknown policy limits, approvers or thresholds are OPEN QUESTIONS.
-5. **No real data.** No real PII, receipts, card or bank numbers anywhere. Use synthetic data.
+5. **No real data, no secrets in git.** No real PII, receipts, card or bank numbers anywhere; use synthetic data.
+   Secrets live only in `.env` (git-ignored; template `env.example`). Never read or print `.env`.
 6. **Use the glossary.** Terms come from `aidlc-docs/glossary/policy-glossary.md`.
 7. **Small bolts.** Keep each change small enough to review in one sitting.
 
