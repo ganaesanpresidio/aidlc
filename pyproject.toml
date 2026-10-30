@@ -1,7 +1,7 @@
 [project]
 name = "aidlc-e2e"
 version = "0.1.0"
-description = "Add your description here"
+description = "Helper tools for the AI-DLC expense management playbook"
 readme = "README.md"
 authors = [
     { name = "ganaesan", email = "ganaesan86@gmail.com" }
@@ -17,3 +17,7 @@ aidlc-e2e = "aidlc_e2e:main"
 [build-system]
 requires = ["uv_build>=0.13.6,<0.14.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# src/ is reserved for the platform units (see docs/00-overview.md)
+module-root = "tools"

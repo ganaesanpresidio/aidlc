@@ -34,7 +34,7 @@ At a glance · 1 Objective · 2 Roles and responsibilities · 3 Entry criteria �
 1. Read [docs/00-overview.md](docs/00-overview.md) for roles, gates and the artifact layout.
 2. Open the activity you are in. Follow section **6. Workflow** step by step.
 3. Use the **starter prompts** in section 10 with Claude Code.
-4. Roll out hooks and subagents when the team is ready — see [docs/hooks-catalog.md](docs/hooks-catalog.md). They are documented here but **not yet active** in `.claude/settings.json`.
+4. Roll out hooks and subagents when the team is ready — see [docs/hooks-catalog.md](docs/hooks-catalog.md). The scripts are installed in `.claude/hooks/` but **not yet active** in `.claude/settings.json`.
 
 ## Repository layout
 
@@ -43,10 +43,14 @@ At a glance · 1 Objective · 2 Roles and responsibilities · 3 Entry criteria �
 ├── CLAUDE.md                 Claude Code project memory
 ├── README.md
 ├── .claude/settings.json     Shared Claude Code settings (committed)
+├── .claude/hooks/            8 gate scripts from the playbook (not enabled yet)
 ├── .editorconfig
 ├── .gitattributes
 ├── .gitignore
 ├── .markdownlint.json
+├── .python-version           Python version for uv
+├── pyproject.toml, uv.lock   Python project (uv)
+├── tools/                    Python helper tools (src/ is reserved for platform units)
 └── docs/
     ├── 00-overview.md
     ├── _TEMPLATE.md

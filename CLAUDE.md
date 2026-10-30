@@ -35,7 +35,8 @@ docs/                 Playbook (this is the source of truth for the method)
   2-build/            BLD-01 … BLD-02
   3-deploy-monitor/   DEP-01 … DEP-02
 aidlc-docs/           Project artifacts created while running the playbook (created on first use)
-.claude/              Shared Claude Code settings (hooks/agents added during rollout)
+.claude/              Shared Claude Code settings; hooks/ holds the 8 gate scripts (not enabled yet)
+tools/                Python helper tools for the playbook (uv project; src/ is reserved for platform units)
 ```
 
 ## Writing or editing docs
@@ -48,5 +49,7 @@ aidlc-docs/           Project artifacts created while running the playbook (crea
 ## Commands
 
 ```bash
-npx markdownlint-cli2 "**/*.md"
+npx markdownlint-cli2 "**/*.md"   # lint docs
+uv sync                            # set up Python env
+uv run aidlc-e2e                   # run helper tools
 ```
