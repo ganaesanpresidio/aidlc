@@ -7,6 +7,17 @@
     "aws-knowledge": {
       "type": "http",
       "url": "${AWS_KNOWLEDGE_MCP_URL:-https://knowledge-mcp.global.api.aws}"
+    },
+    "aws-diagram": {
+      "type": "stdio",
+      "command": "${HOME}/.local/bin/uvx",
+      "args": [
+        "awslabs.aws-diagram-mcp-server@1.0.23"
+      ],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR",
+        "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${HOME}/.local/bin"
+      }
     }
   }
 }
