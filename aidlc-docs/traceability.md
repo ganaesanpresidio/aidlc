@@ -12,7 +12,7 @@ owner: Solution Owner
 One page linking the requirement to its user stories, Jira issues, Confluence pages and every artifact created so far. Update it whenever an activity adds material.
 
 **Requirement:** Employees can submit expenses with receipt attachments ([intent](inception/intent.md)).
-**Status:** DIS-01 approved. DIS-02 approved (policy values are MOCK). DIS-03 not started.
+**Status:** DIS-01 approved. DIS-02 approved (policy values are MOCK). DIS-03 drafted, awaiting Architect approval.
 
 ## 1. User stories and Jira
 
@@ -69,6 +69,21 @@ Domain model and ADRs are not published to Confluence yet (DIS-02 step 9).
 | ADR-004 Receipt threshold in rules | [decisions/adr-004-receipt-threshold-in-rules.md](decisions/adr-004-receipt-threshold-in-rules.md) |
 | Sign-off (APPROVED) | [approvals/spec-signoff.md](approvals/spec-signoff.md) |
 
+### DIS-03 · Units of work and NFRs
+
+| Artifact | Path |
+| --- | --- |
+| NFR baseline (ASSUMPTION) | [inception/nfr-baseline.md](inception/nfr-baseline.md) |
+| Unit catalogue and build order | [inception/units/README.md](inception/units/README.md) |
+| Units: policy, submit, approve, payout, ocr, bi | [inception/units/](inception/units/) |
+| Story to unit map | [inception/units/story-map.md](inception/units/story-map.md) |
+| Interface contracts (draft) | [inception/units/interfaces.md](inception/units/interfaces.md) |
+| NFR matrix | [inception/nfr-matrix.md](inception/nfr-matrix.md) |
+| ADR-005 Unit boundaries | [decisions/adr-005-unit-boundaries.md](decisions/adr-005-unit-boundaries.md) |
+| ADR-006 Versioned events | [decisions/adr-006-versioned-events.md](decisions/adr-006-versioned-events.md) |
+| ADR-007 Async OCR | [decisions/adr-007-async-ocr.md](decisions/adr-007-async-ocr.md) |
+| Approval record (PENDING) | [approvals/units-nfr.md](approvals/units-nfr.md) |
+
 ### Tooling
 
 | Tool | Path | Command |
@@ -85,10 +100,12 @@ Domain model and ADRs are not published to Confluence yet (DIS-02 step 9).
 | FR-1 to FR-8 (submit with receipts) | US-001 / DEV-2 | [domain-model.md](inception/domain-model.md) |
 | FR-6 receipt threshold ₹1,000 | US-001, US-003 | ADR-004, `receipt_threshold` in the rules config |
 | NFR-4 retention 1 year | US-006 / DEV-7 | Risk R1 in the question log |
-| Approval tiers and SoD (next feature) | not yet written | [approval-matrix.md](inception/approval-matrix.md), ADR-002, ADR-003 |
+| Approval tiers and SoD (next feature) | not yet written | [approval-matrix.md](inception/approval-matrix.md), ADR-002, ADR-003, unit [approve](inception/units/approve.md) |
 
 ## 5. Open items
 
+All are recorded as assumptions, questions and risks in the [question log](inception/question-log.md): Q18 to Q36 and risks R2, R3. Summary:
+
 - Replace MOCK policy values with the real policy before go-live.
 - Compliance to confirm 1-year retention (risk R1).
-- Stories for approval routing and reimbursement are not written yet (next DIS-01 cycle).
+- Stories for the `policy`, `approve`, `payout`, `ocr` and `bi` units are not written yet (next DIS-01 cycle, see [story-map.md](inception/units/story-map.md)).
