@@ -1,0 +1,25 @@
+# MOCK values from mock-expense-policy.md (POL-MOCK-001). Replace before go-live.
+version: 1
+effective_from: "2026-11-03"
+base_currency: INR
+receipt_threshold: 1000          # POL-MOCK-001 §4
+submission_window_days: 30       # §7
+escalation_working_days: 5       # §7
+grades: [G1, G2, G3]             # §2
+category_limits:                 # §3, INR
+  Travel:        {unit: per_line,  G1: 25000, G2: 50000, G3: 100000}
+  Accommodation: {unit: per_night, G1: 6000,  G2: 10000, G3: 15000}
+  Meals:         {unit: per_day,   G1: 1500,  G2: 2500,  G3: 4000}
+  Mileage:       {unit: per_km,    G1: 12,    G2: 12,    G3: 12}
+  Other:         {unit: per_line,  G1: 5000,  G2: 10000, G3: 20000}
+approval_tiers:                  # §5, claim total in INR
+  - {id: T1, max_total: 10000,  steps: [LINE_MANAGER]}
+  - {id: T2, max_total: 50000,  steps: [LINE_MANAGER, DEPARTMENT_HEAD]}
+  - {id: T3, max_total: 200000, steps: [DEPARTMENT_HEAD, FINANCE_CONTROLLER]}
+  - {id: T4, max_total: null,   steps: [FINANCE_CONTROLLER, CFO]}
+exception_approver: FINANCE_CONTROLLER   # §8
+segregation_of_duties:           # §6
+  no_self_approval: true
+  distinct_approvers: true
+  payer_cannot_approve: true
+  approver_grade_at_least_submitter: true

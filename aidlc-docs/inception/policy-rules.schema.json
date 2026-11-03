@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Expense policy rules",
+  "type": "object",
+  "required": ["version", "effective_from", "base_currency", "receipt_threshold", "grades",
+               "category_limits", "approval_tiers", "exception_approver", "segregation_of_duties"],
+  "additionalProperties": false,
+  "$defs": {
+    "role": {"enum": ["LINE_MANAGER", "DEPARTMENT_HEAD", "FINANCE_CONTROLLER", "CFO"]}
+  },
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "effective_from": {"type": "string", "format": "date"},
+    "base_currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "receipt_threshold": {"type": "number", "minimum": 0},
+    "submission_window_days": {"type": "integer", "minimum": 1},
+    "escalation_working_days": {"type": "integer", "minimum": 1},
+    "grades": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "category_limits": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["unit"],
+        "properties": {"unit": {"enum": ["per_line", "per_night", "per_day", "per_km"]}},
+        "additionalProperties": {"type": ["number", "string"], "minimum": 0}
+      }
+    },
+    "approval_tiers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "max_total", "steps"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string"},
+          "max_total": {"type": ["number", "null"], "minimum": 0},
+          "steps": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"$ref": "#/$defs/role"}}
+        }
+      }
+    },
+    "exception_approver": {"$ref": "#/$defs/role"},
+    "segregation_of_duties": {
+      "type": "object",
+      "required": ["no_self_approval", "distinct_approvers", "payer_cannot_approve",
+                   "approver_grade_at_least_submitter"],
+      "additionalProperties": {"type": "boolean"}
+    }
+  }
+}

@@ -21,3 +21,11 @@ Use these terms exactly. Do not use the "avoid" words.
 | Cost centre | Budget the claim is charged to | Department |
 | Base currency | Company currency used for reimbursement: INR | Home currency |
 | Reimbursement | Payment of an approved claim to the employee | Refund, payout (use payout only for the unit name) |
+| Grade | Employee level, G1 Staff, G2 Manager or G3 Director. Picks the category limits | Level, band |
+| Category limit | Most an expense line may claim in a category, by grade (INR) | Cap, receipt threshold |
+| Approval tier | Band of claim total that decides which approvers are needed (T1 to T4) | Level |
+| Approval matrix | The table of tiers and their approvers | Workflow |
+| Approval step | One approver's decision on a claim | Review |
+| Exception | Line above its category limit, submitted with a reason; adds the Finance Controller | Override |
+| Segregation of duties (SoD) | Rules that keep submitter, approver and payer apart (SOD-1 to SOD-4) | Conflict check |
+| Policy rules | Versioned config holding limits, tiers and SoD flags | Settings |
