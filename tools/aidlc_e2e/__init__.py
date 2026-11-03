@@ -4,7 +4,7 @@ from aidlc_e2e.config import ENV_FILE, aws_settings, jira_settings
 
 
 def main() -> None:
-    """`uv run aidlc-e2e [check]` — show the Jira settings (token masked); `check` also tests the connection; `publish` creates the mock policy and approval matrix pages in Confluence; `rules` validates the policy rules config and routes sample claims.
+    """`uv run aidlc-e2e [check]` — show the Jira settings (token masked); `check` also tests the connection; `publish [title-text]` creates the mock policy and approval matrix pages in Confluence; `rules` validates the policy rules config and routes sample claims.
 
     Use another env file with AIDLC_ENV_FILE, e.g. `AIDLC_ENV_FILE=env.dev uv run aidlc-e2e check`.
     """
@@ -15,7 +15,7 @@ def main() -> None:
     if sys.argv[1:2] == ["publish"]:
         from aidlc_e2e.confluence import publish
 
-        sys.exit(0 if publish() else 1)
+        sys.exit(0 if publish(sys.argv[2] if len(sys.argv) > 2 else "") else 1)
     settings = jira_settings()
     source = ENV_FILE if ENV_FILE.is_file() else f"environment only ({ENV_FILE.name} not found)"
     print(f"Jira settings from: {source}")
