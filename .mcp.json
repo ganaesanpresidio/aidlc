@@ -3,6 +3,10 @@
     "atlassian": {
       "type": "http",
       "url": "${ATLASSIAN_MCP_URL:-https://mcp.atlassian.com/v1/mcp}"
+    },
+    "aws-knowledge": {
+      "type": "http",
+      "url": "${AWS_KNOWLEDGE_MCP_URL:-https://knowledge-mcp.global.api.aws}"
     }
   }
 }

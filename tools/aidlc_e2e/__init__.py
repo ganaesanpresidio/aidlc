@@ -1,6 +1,6 @@
 import sys
 
-from aidlc_e2e.config import ENV_FILE, jira_settings
+from aidlc_e2e.config import ENV_FILE, aws_settings, jira_settings
 
 
 def main() -> None:
@@ -21,6 +21,9 @@ def main() -> None:
     print(f"Jira settings from: {source}")
     for key, value in settings.masked().items():
         print(f"  {key:<20} {value or '-'}")
+    print("AWS settings:")
+    for key, value in aws_settings().masked().items():
+        print(f"  {key:<22} {value or '-'}")
     if missing := settings.missing():
         print(f"Missing: {', '.join(missing)}. Add them to {ENV_FILE.name} (see env.example).")
         sys.exit(1)

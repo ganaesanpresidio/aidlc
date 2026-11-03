@@ -84,3 +84,26 @@ def jira_settings(env_file: Path = ENV_FILE) -> JiraSettings:
         api_token=get("JIRA_API_TOKEN", "", env_file),
         confluence_space_key=get("CONFLUENCE_SPACE_KEY", "", env_file),
     )
+
+
+@dataclass(frozen=True)
+class AwsSettings:
+    profile: str
+    region: str
+    knowledge_mcp_url: str
+
+    def masked(self) -> dict[str, str]:
+        """No secrets here: SSO profiles hold no keys. Safe to print."""
+        return {
+            "AWS_PROFILE": self.profile,
+            "AWS_REGION": self.region,
+            "AWS_KNOWLEDGE_MCP_URL": self.knowledge_mcp_url,
+        }
+
+
+def aws_settings(env_file: Path = ENV_FILE) -> AwsSettings:
+    return AwsSettings(
+        profile=get("AWS_PROFILE", "", env_file),
+        region=get("AWS_REGION", "", env_file),
+        knowledge_mcp_url=get("AWS_KNOWLEDGE_MCP_URL", "https://knowledge-mcp.global.api.aws", env_file),
+    )
