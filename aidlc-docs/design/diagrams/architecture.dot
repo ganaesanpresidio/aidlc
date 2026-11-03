@@ -1,0 +1,52 @@
+// HLD-001 §2 Architecture and security zones. Render: dot -Tpng architecture.dot -o architecture.png
+digraph arch {
+  rankdir=LR; fontname="Helvetica"; compound=true; nodesep=0.28; ranksep=0.95; newrank=true; splines=true;
+  node [fontname="Helvetica", fontsize=11, shape=box, style="filled", color="#5b6770", fillcolor="#ffffff"];
+  edge [fontname="Helvetica", fontsize=9, color="#5b6770"];
+
+  user [label="Employee, approver,\nfinance (browser)", shape=ellipse, fillcolor="#f4f6f8"];
+
+  subgraph cluster_edge { label="Edge zone"; style="filled,rounded"; fillcolor="#e8eefc"; color="#7a8fd1"; fontname="Helvetica-Bold";
+    web   [label="Web app\nS3 + CloudFront + WAF"];
+    apigw [label="API Gateway\nJWT authorizer\n(company SSO)"];
+  }
+  subgraph cluster_app { label="Application zone\n(one IAM role per unit)"; style="filled,rounded"; fillcolor="#e9f5e9"; color="#6aa96a"; fontname="Helvetica-Bold";
+    policy  [label="policy\nLambda"];
+    submit  [label="submit\nLambda"];
+    approve [label="approve\nLambda + Step Functions"];
+    payout  [label="payout\nLambda"];
+    ocr     [label="ocr\nLambda"];
+    bi      [label="bi\nLambda + Athena"];
+  }
+  subgraph cluster_data { label="Data zone\n(KMS encrypted, one store per unit)"; style="filled,rounded"; fillcolor="#fde8e8"; color="#d17a7a"; fontname="Helvetica-Bold";
+    dpol [label="policy table", shape=cylinder];
+    dsub [label="submit table", shape=cylinder];
+    rcpt [label="receipts bucket", shape=cylinder];
+    dapp [label="approve table", shape=cylinder];
+    dpay [label="payout table", shape=cylinder];
+    docr [label="ocr table", shape=cylinder];
+    lake [label="bi data lake", shape=cylinder];
+  }
+  subgraph cluster_int { label="Integration zone"; style="filled,rounded"; fillcolor="#fff4d6"; color="#d1a63a"; fontname="Helvetica-Bold";
+    bus   [label="EventBridge bus\n(versioned events)", shape=hexagon];
+    q     [label="SQS queue + DLQ\n(OCR work)"];
+    audit [label="Audit store\nS3 Object Lock, 7 years", shape=cylinder];
+  }
+  tx [label="Amazon Textract\n(async)", fillcolor="#f4f6f8"];
+
+  { rank=same; policy; submit; approve; payout; ocr; bi; }
+  { rank=same; dpol; dsub; rcpt; dapp; dpay; docr; lake; }
+  { rank=same; bus; q; audit; tx; }
+
+  user -> web -> apigw;
+  apigw -> policy; apigw -> submit; apigw -> approve; apigw -> payout; apigw -> bi;
+
+  policy -> dpol; submit -> dsub; submit -> rcpt; approve -> dapp;
+  payout -> dpay; ocr -> docr; bi -> lake;
+
+  dpol -> bus [style=invis]; lake -> bus [style=invis];
+  bus -> q [label="ReceiptStored"]; q -> ocr [constraint=false, label="work"]; ocr -> tx [constraint=false];
+  bus -> audit [label="all events"];
+  submit -> bus [ltail=cluster_app, style=dashed, label="units publish\nevents"];
+  bus -> bi [lhead=cluster_app, style=dashed, label="units subscribe\n(bi reads all)"];
+}

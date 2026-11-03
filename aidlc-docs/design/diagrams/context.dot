@@ -1,0 +1,21 @@
+// HLD-001 §1 System context. Render: dot -Tpng context.dot -o context.png
+digraph context {
+  rankdir=LR; fontname="Helvetica"; nodesep=0.5; ranksep=0.9;
+  node [fontname="Helvetica", fontsize=12, style="filled", color="#5b6770", fillcolor="#f4f6f8"];
+  edge [fontname="Helvetica", fontsize=10, color="#5b6770"];
+
+  emp  [label="Employee",  shape=ellipse];
+  apr  [label="Approver",  shape=ellipse];
+  fin  [label="Finance",   shape=ellipse];
+  idp  [label="Company SSO\n(OIDC)", shape=box, fillcolor="#e8eefc"];
+  plat [label="Expense Platform\nAWS ap-south-1", shape=box, style="filled,bold", fillcolor="#ffe9c7", color="#b36b00", fontsize=14];
+  bank [label="Bank finance system", shape=box, fillcolor="#e8eefc"];
+  mail [label="Email", shape=box, fillcolor="#e8eefc"];
+
+  emp -> plat [label="submit claims,\nattach receipts"];
+  apr -> plat [label="approve or reject"];
+  fin -> plat [label="rules, mark paid,\nreports"];
+  idp -> plat [label="sign-in, grade\nand role claims", style=dashed];
+  plat -> bank [label="reimbursement\nby reference only"];
+  plat -> mail [label="notifications"];
+}

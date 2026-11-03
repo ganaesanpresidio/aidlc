@@ -3,7 +3,7 @@ id: QLOG-001
 title: Question log — Submit expenses with receipt attachments
 activity: DIS-01
 status: DIS-01 approved. DIS-02 and DIS-03 assumptions open
-version: 0.3.0
+version: 0.4.0
 last_updated: 2026-11-03
 owner: Solution Owner
 ---
@@ -92,6 +92,8 @@ Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs 
 | Q34 | Are employee bank details stored? | No. Payment goes through the bank's finance system by reference | ASSUMPTION |
 | Q35 | What is the monthly cloud cost target per 1,000 claims? | No number proposed. Set it from the first LLD estimate | OPEN QUESTION |
 | Q36 | Which stories come next? | Stories for `policy`, `approve`, `payout`, `ocr` and `bi` are written in the next DIS-01 cycle ([story-map.md](units/story-map.md)) | ASSUMPTION |
+| Q37 | Which sign-in does the company use? | An OIDC single sign-on provider that sends grade and role as group claims | ASSUMPTION |
+| Q38 | How many AWS accounts? | Three: dev, test and prod | ASSUMPTION |
 
 ## Risks raised
 
@@ -105,7 +107,7 @@ Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs 
 
 | Status | Count |
 | --- | --- |
-| ASSUMPTION | 31 (Q1–Q7, Q9, Q10, Q14–Q34, Q36) |
+| ASSUMPTION | 33 (Q1–Q7, Q9, Q10, Q14–Q34, Q36–Q38) |
 | OPEN QUESTION | 1 (Q35) |
 | CONFIRMED | 4 (Q8, Q11, Q12, Q13) |
 | Risks | 3 (R1 to R3) |
@@ -117,3 +119,4 @@ Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs 
 | 0.1.0 | 2026-10-30 | Claude (proposed) | First 15 questions with starter answers |
 | 0.2.0 | 2026-10-30 | Solution Owner (answers), Claude (recorded) | Q8, Q11, Q12, Q13 confirmed; added Q16, Q17 and risk R1 |
 | 0.3.0 | 2026-11-03 | Claude (proposed) | Added Batch E (Q18 to Q23, DIS-02) and Batch F (Q24 to Q36, DIS-03), risks R2 and R3 |
+| 0.4.0 | 2026-11-03 | Claude (proposed) | Added Q37 (SSO) and Q38 (AWS accounts) from the HLD |

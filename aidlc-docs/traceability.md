@@ -12,7 +12,7 @@ owner: Solution Owner
 One page linking the requirement to its user stories, Jira issues, Confluence pages and every artifact created so far. Update it whenever an activity adds material.
 
 **Requirement:** Employees can submit expenses with receipt attachments ([intent](inception/intent.md)).
-**Status:** DIS-01 approved. DIS-02 approved (policy values are MOCK). DIS-03 drafted, awaiting Architect approval.
+**Status:** DIS-01 approved. DIS-02 approved (policy values are MOCK). DIS-03 approved. DIS-04 HLD drafted.
 
 ## 1. User stories and Jira
 
@@ -38,8 +38,10 @@ Space `AIDLC`: <https://presidio-team-w7ye7n13.atlassian.net/wiki/spaces/AIDLC>
 | --- | --- | --- |
 | Mock expense policy (MOCK DATA) | [open](https://presidio-team-w7ye7n13.atlassian.net/wiki/spaces/AIDLC/pages/1474561/AIDLC+Mock+expense+policy+MOCK+DATA) | [mock-expense-policy.md](inception/mock-expense-policy.md) |
 | Approval matrix (MOCK DATA) | [open](https://presidio-team-w7ye7n13.atlassian.net/wiki/spaces/AIDLC/pages/1507329/AIDLC+Approval+matrix+MOCK+DATA) | [approval-matrix.md](inception/approval-matrix.md) |
+| High-level design (DRAFT) | [open](https://presidio-team-w7ye7n13.atlassian.net/wiki/spaces/AIDLC/pages/1671170/AIDLC+High-level+design+DRAFT) | [design/hld.md](design/hld.md) |
+| Requirement traceability | published from this file | [traceability.md](traceability.md) |
 
-Domain model and ADRs are not published to Confluence yet (DIS-02 step 9).
+The domain model and ADRs are not published to Confluence yet (DIS-02 step 9).
 
 ## 3. Material created so far
 
@@ -84,6 +86,14 @@ Domain model and ADRs are not published to Confluence yet (DIS-02 step 9).
 | ADR-007 Async OCR | [decisions/adr-007-async-ocr.md](decisions/adr-007-async-ocr.md) |
 | Approval record (PENDING) | [approvals/units-nfr.md](approvals/units-nfr.md) |
 
+### DIS-04 · Design (in progress)
+
+| Artifact | Path |
+| --- | --- |
+| HLD (draft), also on [Confluence](https://presidio-team-w7ye7n13.atlassian.net/wiki/spaces/AIDLC/pages/1671170/AIDLC+High-level+design+DRAFT) | [design/hld.md](design/hld.md) |
+| ADR-008 Serverless platform | [decisions/adr-008-serverless-platform.md](decisions/adr-008-serverless-platform.md) |
+| LLD per unit | not started |
+
 ### Tooling
 
 | Tool | Path | Command |
@@ -104,7 +114,7 @@ Domain model and ADRs are not published to Confluence yet (DIS-02 step 9).
 
 ## 5. Open items
 
-All are recorded as assumptions, questions and risks in the [question log](inception/question-log.md): Q18 to Q36 and risks R2, R3. Summary:
+All are recorded as assumptions, questions and risks in the [question log](inception/question-log.md): Q18 to Q38 and risks R2, R3. Summary:
 
 - Replace MOCK policy values with the real policy before go-live.
 - Compliance to confirm 1-year retention (risk R1).

@@ -5,10 +5,11 @@ tools: Read, Grep, Glob, Write, Edit
 ---
 
 Rules:
+
 - Follow the approved unit scope, interfaces, NFR matrix and ADRs. Do not change scope.
 - Each LLD has these sections: Context, APIs (OpenAPI), Events, Data model, Sequences,
   Errors and retries, Security and PII, NFR mapping, Test approach, Open questions.
 - Every NFR in the matrix maps to a design element or is flagged.
-- Diagrams are code (AWS Diagram MCP / Mermaid) and are committed next to the LLD.
+- Diagrams are code (AWS Diagram MCP or Graphviz) and are committed next to the LLD.
 - Write only under aidlc-docs/design/. Never write under src/ or infra/.
 - Never edit files in aidlc-docs/approvals/.

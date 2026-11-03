@@ -6,7 +6,10 @@ The token is never printed.
 
 from __future__ import annotations
 
+import html as htmllib
+import posixpath
 import re
+import subprocess
 import sys
 
 import markdown
@@ -21,15 +24,53 @@ INCEPTION = PROJECT_ROOT / "aidlc-docs" / "inception"
 PAGES = [
     ("AIDLC · Mock expense policy (MOCK DATA)", INCEPTION / "mock-expense-policy.md"),
     ("AIDLC · Approval matrix (MOCK DATA)", INCEPTION / "approval-matrix.md"),
+    ("AIDLC · Requirement traceability", PROJECT_ROOT / "aidlc-docs" / "traceability.md"),
+    ("AIDLC · High-level design (DRAFT)", PROJECT_ROOT / "aidlc-docs" / "design" / "hld.md"),
 ]
+
+
+def _code_macros(html: str) -> str:
+    """Turn <pre><code> blocks into Confluence code macros (Mermaid diagrams show as source)."""
+    def repl(m: re.Match) -> str:
+        lang = m.group(1) or "none"
+        lang = "none" if lang == "mermaid" else lang
+        code = htmllib.unescape(m.group(2)).replace("]]>", "]]]]><![CDATA[>")
+        return (f'<ac:structured-macro ac:name="code"><ac:parameter ac:name="language">{lang}</ac:parameter>'
+                f"<ac:plain-text-body><![CDATA[{code}]]></ac:plain-text-body></ac:structured-macro>")
+    return re.sub(r'<pre><code(?: class="language-([\w-]+)")?>(.*?)</code></pre>', repl, html, flags=re.S)
+
+
+def _repo_web_url() -> str:
+    """https://github.com/<owner>/<repo>/blob/main, from the origin remote; empty if unknown."""
+    try:
+        url = subprocess.run(["git", "remote", "get-url", "origin"], cwd=PROJECT_ROOT,
+                             capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+    return re.sub(r"\.git$", "", url) + "/blob/main" if url.startswith("https://github.com/") else ""
+
+
+def _link_repo_paths(text: str, path) -> str:
+    """Repo-relative links become GitHub links when the remote is known, else plain text."""
+    base = _repo_web_url()
+    rel_dir = posixpath.dirname(str(path.relative_to(PROJECT_ROOT)))
+
+    def repl(m: re.Match) -> str:
+        label, target = m.group(1), m.group(2)
+        if not base or target.startswith("#"):
+            return label
+        file_part, _, frag = target.partition("#")
+        full = posixpath.normpath(posixpath.join(rel_dir, file_part))
+        return f"[{label}]({base}/{full}{'#' + frag if frag else ''})"
+    return re.sub(r"\[([^\]]+)\]\((?!https?:)([^)]*)\)", repl, text)
 
 
 def to_storage(path) -> str:
     text = re.sub(r"\A---\n.*?\n---\n", "", path.read_text(), flags=re.S)
     text = re.sub(r"^# .*\n", "", text, count=1, flags=re.M)  # page title carries the H1
-    text = re.sub(r"\[([^\]]+)\]\((?!https?:)[^)]*\)", r"\1", text)  # repo-relative links are not valid here
-    html = markdown.markdown(text, extensions=["tables", "fenced_code"])
-    return html + "<p><em>Source: aidlc-docs/inception/" + path.name + " in the repo. Edit there.</em></p>"
+    text = _link_repo_paths(text, path)
+    html = _code_macros(markdown.markdown(text, extensions=["tables", "fenced_code"]))
+    return html + f"<p><em>Source: {path.relative_to(PROJECT_ROOT)} in the repo. Edit there. Diagrams are Mermaid source; render them from the repo.</em></p>"
 
 
 def publish() -> bool:

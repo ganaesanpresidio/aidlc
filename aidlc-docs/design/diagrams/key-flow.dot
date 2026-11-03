@@ -1,0 +1,23 @@
+// HLD-001 §3 Key flow, submit to payout. Render: dot -Tpng key-flow.dot -o key-flow.png
+digraph flow {
+  rankdir=LR; fontname="Helvetica"; nodesep=0.4; ranksep=0.6;
+  node [fontname="Helvetica", fontsize=11, shape=box, style="filled,rounded", color="#5b6770", fillcolor="#f4f6f8"];
+  edge [fontname="Helvetica", fontsize=9, color="#5b6770"];
+
+  s1 [label="1. Employee adds lines\nand uploads receipt\n(submit)"];
+  s2 [label="2. Employee submits\n(submit)"];
+  p1 [label="3. Check limits and\nreceipt rule\n(policy: evaluate)", fillcolor="#e9f5e9"];
+  e1 [label="ClaimSubmitted", shape=hexagon, fillcolor="#fff4d6"];
+  a1 [label="4. Get approval chain\nand SoD result\n(policy: route)", fillcolor="#e9f5e9"];
+  a2 [label="5. Approval steps\n(approve, 5-day escalation)"];
+  e2 [label="ClaimApproved", shape=hexagon, fillcolor="#fff4d6"];
+  y1 [label="6. Reimbursement by\nreference\n(payout)"];
+  e3 [label="PayoutIssued", shape=hexagon, fillcolor="#fff4d6"];
+  s3 [label="7. Employee sees\nstatus (submit)"];
+  r1 [label="ReceiptStored", shape=hexagon, fillcolor="#fff4d6"];
+  o1 [label="OCR suggestion\n(ocr, async,\nnever blocks)", fillcolor="#e8eefc"];
+  e4 [label="ReceiptExtracted", shape=hexagon, fillcolor="#fff4d6"];
+
+  s1 -> s2 -> p1 -> e1 -> a1 -> a2 -> e2 -> y1 -> e3 -> s3;
+  s1 -> r1 [style=dashed]; r1 -> o1 [style=dashed]; o1 -> e4 [style=dashed]; e4 -> s2 [style=dashed, label="suggestion only", constraint=false];
+}
