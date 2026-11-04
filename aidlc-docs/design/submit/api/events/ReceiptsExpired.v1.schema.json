@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReceiptsExpired v1",
+  "type": "object",
+  "required": ["event", "version", "id", "occurredAt", "claimRef", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "event": {"const": "ReceiptsExpired"},
+    "version": {"const": 1},
+    "id": {"type": "string", "format": "uuid"},
+    "occurredAt": {"type": "string", "format": "date-time"},
+    "claimRef": {"type": ["string", "null"], "description": "Null only for ReceiptStored on a draft"},
+    "rulesVersion": {"type": "integer", "minimum": 1},
+    "payload": {"type":"object","required":["receiptIds","retentionDays"],"additionalProperties":false,"properties":{"receiptIds":{"type":"array","items":{"type":"string"},"minItems":1},"retentionDays":{"type":"integer","minimum":1}}}
+  }
+}

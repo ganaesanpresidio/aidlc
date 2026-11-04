@@ -3,8 +3,8 @@ id: IFACE-001
 title: Interface contracts (draft)
 activity: DIS-03
 status: Draft — awaiting Architect approval
-version: 0.1.0
-last_updated: 2026-11-03
+version: 0.2.0
+last_updated: 2026-11-04
 owner: Architect
 ---
 
@@ -33,7 +33,7 @@ Rules: events are past tense, carry a version, and hold ids not personal data. A
 | `PolicyRulesPublished` | policy | submit, approve, bi | rulesVersion, effectiveFrom |
 | `ReceiptStored` | submit | ocr, bi | receiptId, claimRef, lineId, mimeType, sizeBytes |
 | `ReceiptsExpired` | submit | bi | receiptIds, retentionVersion |
-| `ClaimSubmitted` | submit | approve, bi | claimRef, totalInr, gradeOfSubmitter, lineCount |
+| `ClaimSubmitted` | submit | approve, bi | claimRef, submitterId, gradeOfSubmitter, totalInr, lineCount, requiresException |
 | `ClaimWithdrawn` | submit | approve, bi | claimRef |
 | `ReceiptExtracted` | ocr | submit, bi | receiptId, confidence |
 | `ReceiptExtractionFailed` | ocr | submit | receiptId, reason |
@@ -57,3 +57,10 @@ Everything else is event-driven.
 ## Compatibility rule
 
 A change that removes or renames a field is a new major version (`v2`) and both versions run side by side until consumers move.
+
+## Change log
+
+| Version | Date | Change |
+| --- | --- | --- |
+| 0.1.0 | 2026-11-03 | First draft |
+| 0.2.0 | 2026-11-04 | `ClaimSubmitted` gains `submitterId` and `requiresException` so `approve` can route without reading `submit` data (found in the submit LLD) |

@@ -3,8 +3,8 @@ id: QLOG-001
 title: Question log — Submit expenses with receipt attachments
 activity: DIS-01
 status: DIS-01 approved. DIS-02 and DIS-03 assumptions open
-version: 0.4.0
-last_updated: 2026-11-03
+version: 0.5.0
+last_updated: 2026-11-04
 owner: Solution Owner
 ---
 
@@ -73,7 +73,7 @@ All policy numbers come from the invented [mock policy](mock-expense-policy.md).
 | Q22 | How long after the expense can a claim be submitted? | 30 days | ASSUMPTION |
 | Q23 | Can a line go over its category limit? | Yes, with a written reason. It adds the Finance Controller as an approver | ASSUMPTION |
 
-## Batch F — DIS-03 (units and NFRs)
+## Batch F — DIS-03 (units and NFRs) and DIS-04 (designs)
 
 Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs are approved (`aidlc-docs/approvals/units-nfr.md`). Values are in the [NFR baseline](nfr-baseline.md) and [NFR matrix](nfr-matrix.md).
 
@@ -94,6 +94,15 @@ Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs 
 | Q36 | Which stories come next? | Stories for `policy`, `approve`, `payout`, `ocr` and `bi` are written in the next DIS-01 cycle ([story-map.md](units/story-map.md)) | ASSUMPTION |
 | Q37 | Which sign-in does the company use? | An OIDC single sign-on provider that sends grade and role as group claims | ASSUMPTION |
 | Q38 | How many AWS accounts? | Three: dev, test and prod | ASSUMPTION |
+| Q39 | Who resolves the holders of each approval role (line manager, department head, finance controller, CFO)? | The `approve` unit, from the company directory, so `policy` holds no HR data | ASSUMPTION |
+| Q40 | How are non-INR lines turned into an INR total for the approval tier? | The employee enters an INR equivalent per non-INR line. Finance verifies it at payout. No automatic conversion in v1 | ASSUMPTION |
+| Q41 | Does submit check category limits? Q15 said no, the approved mock policy says an over-limit line needs a reason | Q15 is superseded: submit enforces limits through `policy` evaluate | ASSUMPTION |
+| Q42 | Where is the retention period configured? | An optional `retention_days` field in the policy rules, so it changes without code | ASSUMPTION |
+| Q43 | How do approvers and finance open receipts? | `approve` asks `submit` for a 60 second signed link over IAM, after checking the assignment | ASSUMPTION |
+| Q44 | How are events published reliably? | Write to the table first, then a DynamoDB stream and EventBridge Pipe publish the event | ASSUMPTION |
+| Q45 | Who can read the policy rules? | Every signed-in user, because limits are not secret | ASSUMPTION |
+| Q46 | Can rules be back-dated? | No. Versions are immutable and move forward only | ASSUMPTION |
+| Q47 | Who builds the web app? | One web app. Each unit's bolts add its screens, reviewed by the front-end developer | ASSUMPTION |
 
 ## Risks raised
 
@@ -107,7 +116,7 @@ Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs 
 
 | Status | Count |
 | --- | --- |
-| ASSUMPTION | 33 (Q1–Q7, Q9, Q10, Q14–Q34, Q36–Q38) |
+| ASSUMPTION | 42 (Q1–Q7, Q9, Q10, Q14–Q34, Q36–Q47) |
 | OPEN QUESTION | 1 (Q35) |
 | CONFIRMED | 4 (Q8, Q11, Q12, Q13) |
 | Risks | 3 (R1 to R3) |
@@ -120,3 +129,4 @@ Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs 
 | 0.2.0 | 2026-10-30 | Solution Owner (answers), Claude (recorded) | Q8, Q11, Q12, Q13 confirmed; added Q16, Q17 and risk R1 |
 | 0.3.0 | 2026-11-03 | Claude (proposed) | Added Batch E (Q18 to Q23, DIS-02) and Batch F (Q24 to Q36, DIS-03), risks R2 and R3 |
 | 0.4.0 | 2026-11-03 | Claude (proposed) | Added Q37 (SSO) and Q38 (AWS accounts) from the HLD |
+| 0.5.0 | 2026-11-04 | Claude (proposed) | Added Q39 to Q47 from the policy and submit LLDs |

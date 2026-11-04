@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: Policy unit API
+  version: 1.0.0
+  description: >
+    Public routes (rules read and publish) go through API Gateway with JWT.
+    Evaluate and route are internal, IAM-signed, and not exposed publicly.
+servers:
+  - url: https://api.example.internal
+paths:
+  /v1/policy/rules:
+    get:
+      operationId: getRulesInForce
+      summary: Rules in force on a date
+      parameters:
+        - {name: effectiveOn, in: query, required: false, schema: {type: string, format: date}, description: Defaults to today}
+      responses:
+        "200": {description: Rules document, content: {application/json: {schema: {$ref: "#/components/schemas/RulesVersion"}}}}
+        "400": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
+    put:
+      operationId: publishRules
+      summary: Publish a new rules version (finance-admin only)
+      parameters:
+        - {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 8, maxLength: 64}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Rules"}
+      responses:
+        "201": {description: Stored, content: {application/json: {schema: {$ref: "#/components/schemas/RulesVersion"}}}}
+        "403": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /v1/policy/rules/{version}:
+    get:
+      operationId: getRulesByVersion
+      parameters:
+        - {name: version, in: path, required: true, schema: {type: integer, minimum: 1}}
+      responses:
+        "200": {description: Rules document, content: {application/json: {schema: {$ref: "#/components/schemas/RulesVersion"}}}}
+        "404": {$ref: "#/components/responses/Error"}
+  /v1/policy/evaluate:
+    post:
+      operationId: evaluateLines
+      summary: Check lines against limits, receipt rule and window (internal)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/EvaluateRequest"}
+      responses:
+        "200": {description: Result, content: {application/json: {schema: {$ref: "#/components/schemas/EvaluateResult"}}}}
+        "400": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
+  /v1/policy/route:
+    post:
+      operationId: routeClaim
+      summary: Approval chain and SoD result (internal)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/RouteRequest"}
+      responses:
+        "200": {description: Chain or blocked, content: {application/json: {schema: {$ref: "#/components/schemas/RouteResult"}}}}
+        "400": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
+components:
+  responses:
+    Error:
+      description: Request error
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: {type: string, example: NO_RULES_IN_FORCE}
+        message: {type: string}
+        details: {type: array, items: {type: string}}
+    Role:
+      type: string
+      enum: [LINE_MANAGER, DEPARTMENT_HEAD, FINANCE_CONTROLLER, CFO]
+    Rules:
+      type: object
+      description: Same shape as aidlc-docs/inception/policy-rules.schema.json
+      additionalProperties: true
+    RulesVersion:
+      type: object
+      required: [version, effectiveFrom, rules]
+      properties:
+        version: {type: integer}
+        effectiveFrom: {type: string, format: date}
+        publishedAt: {type: string, format: date-time}
+        rules: {$ref: "#/components/schemas/Rules"}
+    Line:
+      type: object
+      required: [lineId, category, amount, currency, expenseDate, hasReceipt]
+      properties:
+        lineId: {type: string}
+        category: {type: string, example: Meals}
+        amount: {type: number, minimum: 0}
+        currency: {type: string, pattern: "^[A-Z]{3}$"}
+        quantity: {type: number, minimum: 0, description: "Nights, days or km for per-unit categories"}
+        expenseDate: {type: string, format: date}
+        hasReceipt: {type: boolean}
+        exceptionReason: {type: string, maxLength: 500}
+    EvaluateRequest:
+      type: object
+      required: [grade, submissionDate, lines]
+      properties:
+        grade: {type: string, example: G1}
+        submissionDate: {type: string, format: date}
+        lines: {type: array, minItems: 1, items: {$ref: "#/components/schemas/Line"}}
+    Violation:
+      type: object
+      required: [lineId, code]
+      properties:
+        lineId: {type: string}
+        code: {type: string, enum: [LIMIT_EXCEEDED, RECEIPT_REQUIRED, WINDOW_EXPIRED, UNKNOWN_CATEGORY]}
+        limit: {type: number}
+    EvaluateResult:
+      type: object
+      required: [ok, rulesVersion, violations, requiresException]
+      properties:
+        ok: {type: boolean}
+        rulesVersion: {type: integer}
+        requiresException: {type: boolean}
+        violations: {type: array, items: {$ref: "#/components/schemas/Violation"}}
+    RouteRequest:
+      type: object
+      required: [claimRef, submitter, grade, totalInr, requiresException, roleHolders]
+      properties:
+        claimRef: {type: string}
+        submitter: {type: string, description: Opaque employee id}
+        grade: {type: string}
+        totalInr: {type: number, minimum: 0}
+        requiresException: {type: boolean}
+        payer: {type: string, description: "Opaque employee id, if already known"}
+        roleHolders:
+          type: object
+          description: Role to person, resolved by the caller
+          additionalProperties:
+            type: object
+            required: [id, grade]
+            properties:
+              id: {type: string}
+              grade: {type: string}
+    RouteResult:
+      type: object
+      properties:
+        rulesVersion: {type: integer}
+        tier: {type: string, example: T2}
+        chain:
+          type: array
+          items:
+            type: object
+            required: [role, approver]
+            properties:
+              role: {$ref: "#/components/schemas/Role"}
+              approver: {type: string}
+        blocked:
+          type: object
+          properties:
+            code: {type: string, enum: [SOD-1, SOD-2, SOD-3, SOD-4, MISSING_ROLE_HOLDER]}
+            role: {$ref: "#/components/schemas/Role"}

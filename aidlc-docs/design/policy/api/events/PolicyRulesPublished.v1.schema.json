@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PolicyRulesPublished v1",
+  "type": "object",
+  "required": ["event", "version", "id", "occurredAt", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "event": {"const": "PolicyRulesPublished"},
+    "version": {"const": 1},
+    "id": {"type": "string", "format": "uuid"},
+    "occurredAt": {"type": "string", "format": "date-time"},
+    "payload": {
+      "type": "object",
+      "required": ["rulesVersion", "effectiveFrom"],
+      "additionalProperties": false,
+      "properties": {
+        "rulesVersion": {"type": "integer", "minimum": 1},
+        "effectiveFrom": {"type": "string", "format": "date"}
+      }
+    }
+  }
+}

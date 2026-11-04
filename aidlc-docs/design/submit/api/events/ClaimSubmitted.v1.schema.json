@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClaimSubmitted v1",
+  "type": "object",
+  "required": ["event", "version", "id", "occurredAt", "claimRef", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "event": {"const": "ClaimSubmitted"},
+    "version": {"const": 1},
+    "id": {"type": "string", "format": "uuid"},
+    "occurredAt": {"type": "string", "format": "date-time"},
+    "claimRef": {"type": ["string", "null"], "description": "Null only for ReceiptStored on a draft"},
+    "rulesVersion": {"type": "integer", "minimum": 1},
+    "payload": {"type":"object","required":["submitterId","gradeOfSubmitter","totalInr","lineCount","requiresException"],"additionalProperties":false,"properties":{"submitterId":{"type":"string"},"gradeOfSubmitter":{"type":"string"},"totalInr":{"type":"number","minimum":0},"lineCount":{"type":"integer","minimum":1},"requiresException":{"type":"boolean"}}}
+  }
+}

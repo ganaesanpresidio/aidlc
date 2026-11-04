@@ -1,0 +1,227 @@
+openapi: 3.0.3
+info:
+  title: Submit unit API
+  version: 1.0.0
+  description: >
+    Public routes use API Gateway with a JWT. Every route acts only on the caller's own claims.
+    The /internal route is IAM-signed and called by the approve unit only.
+servers:
+  - url: https://api.example.internal
+paths:
+  /v1/claims:
+    post:
+      operationId: createClaim
+      responses:
+        "201": {description: Draft created, content: {application/json: {schema: {$ref: "#/components/schemas/Claim"}}}}
+    get:
+      operationId: listMyClaims
+      parameters:
+        - {name: status, in: query, schema: {$ref: "#/components/schemas/Status"}}
+        - {name: cursor, in: query, schema: {type: string}}
+      responses:
+        "200": {description: My claims, content: {application/json: {schema: {$ref: "#/components/schemas/ClaimPage"}}}}
+  /v1/claims/{claimId}:
+    parameters:
+      - {$ref: "#/components/parameters/ClaimId"}
+    get:
+      operationId: getClaim
+      responses:
+        "200": {description: Claim with lines and receipts, content: {application/json: {schema: {$ref: "#/components/schemas/Claim"}}}}
+        "404": {$ref: "#/components/responses/Error"}
+  /v1/claims/{claimId}/lines:
+    parameters:
+      - {$ref: "#/components/parameters/ClaimId"}
+    post:
+      operationId: addLine
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: "#/components/schemas/LineInput"}}}
+      responses:
+        "201": {description: Line added, content: {application/json: {schema: {$ref: "#/components/schemas/Line"}}}}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /v1/claims/{claimId}/lines/{lineId}:
+    parameters:
+      - {$ref: "#/components/parameters/ClaimId"}
+      - {$ref: "#/components/parameters/LineId"}
+    patch:
+      operationId: updateLine
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: "#/components/schemas/LineInput"}}}
+      responses:
+        "200": {description: Updated, content: {application/json: {schema: {$ref: "#/components/schemas/Line"}}}}
+        "409": {$ref: "#/components/responses/Error"}
+    delete:
+      operationId: deleteLine
+      responses:
+        "204": {description: Deleted}
+        "409": {$ref: "#/components/responses/Error"}
+  /v1/claims/{claimId}/lines/{lineId}/receipts:
+    parameters:
+      - {$ref: "#/components/parameters/ClaimId"}
+      - {$ref: "#/components/parameters/LineId"}
+    post:
+      operationId: requestReceiptUpload
+      summary: Get a presigned POST for one receipt
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: "#/components/schemas/ReceiptUploadRequest"}}}
+      responses:
+        "201": {description: Upload slot, content: {application/json: {schema: {$ref: "#/components/schemas/ReceiptUploadSlot"}}}}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /v1/claims/{claimId}/lines/{lineId}/receipts/{receiptId}:
+    parameters:
+      - {$ref: "#/components/parameters/ClaimId"}
+      - {$ref: "#/components/parameters/LineId"}
+      - {$ref: "#/components/parameters/ReceiptId"}
+    get:
+      operationId: getReceipt
+      responses:
+        "200": {description: Receipt status, content: {application/json: {schema: {$ref: "#/components/schemas/Receipt"}}}}
+        "404": {$ref: "#/components/responses/Error"}
+    delete:
+      operationId: deleteReceipt
+      responses:
+        "204": {description: Removed}
+        "409": {$ref: "#/components/responses/Error"}
+  /v1/claims/{claimId}/lines/{lineId}/receipts/{receiptId}/content:
+    parameters:
+      - {$ref: "#/components/parameters/ClaimId"}
+      - {$ref: "#/components/parameters/LineId"}
+      - {$ref: "#/components/parameters/ReceiptId"}
+    get:
+      operationId: getReceiptContent
+      responses:
+        "302": {description: Redirect to a 60 second signed URL}
+        "404": {$ref: "#/components/responses/Error"}
+  /v1/claims/{claimId}/submit:
+    parameters:
+      - {$ref: "#/components/parameters/ClaimId"}
+    post:
+      operationId: submitClaim
+      parameters:
+        - {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 8, maxLength: 64}}
+      responses:
+        "200": {description: Submitted, content: {application/json: {schema: {$ref: "#/components/schemas/Claim"}}}}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {description: Policy violations or missing receipts, content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}}
+        "503": {$ref: "#/components/responses/Error"}
+  /v1/claims/{claimId}/withdraw:
+    parameters:
+      - {$ref: "#/components/parameters/ClaimId"}
+    post:
+      operationId: withdrawClaim
+      responses:
+        "200": {description: Withdrawn, content: {application/json: {schema: {$ref: "#/components/schemas/Claim"}}}}
+        "409": {$ref: "#/components/responses/Error"}
+  /internal/v1/receipts/{receiptId}/access-url:
+    parameters:
+      - {$ref: "#/components/parameters/ReceiptId"}
+    post:
+      operationId: getReceiptAccessUrl
+      summary: Signed URL for an approver or finance (IAM, approve unit only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [claimRef, requestedBy]
+              properties:
+                claimRef: {type: string}
+                requestedBy: {type: string, description: "Opaque employee id, already authorised by approve"}
+      responses:
+        "200": {description: URL, content: {application/json: {schema: {type: object, required: [url, expiresInSeconds], properties: {url: {type: string, format: uri}, expiresInSeconds: {type: integer}}}}}}
+        "404": {$ref: "#/components/responses/Error"}
+components:
+  parameters:
+    ClaimId: {name: claimId, in: path, required: true, schema: {type: string, minLength: 26, maxLength: 26}}
+    LineId: {name: lineId, in: path, required: true, schema: {type: string}}
+    ReceiptId: {name: receiptId, in: path, required: true, schema: {type: string}}
+  responses:
+    Error:
+      description: Request error
+      content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: {type: string, example: CLAIM_NOT_EDITABLE}
+        message: {type: string}
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              lineId: {type: string}
+              code: {type: string}
+              message: {type: string}
+    Status:
+      type: string
+      enum: [Draft, Submitted, Approved, Rejected, Withdrawn, Paid]
+    LineInput:
+      type: object
+      required: [expenseDate, category, amount, currency, description]
+      properties:
+        expenseDate: {type: string, format: date}
+        category: {type: string, enum: [Travel, Accommodation, Meals, Mileage, Other]}
+        amount: {type: number, minimum: 0}
+        currency: {type: string, pattern: "^[A-Z]{3}$", default: INR}
+        amountInr: {type: number, minimum: 0, description: "Employee-stated INR equivalent, needed when currency is not INR (Q40)"}
+        quantity: {type: number, minimum: 0}
+        description: {type: string, maxLength: 500}
+        exceptionReason: {type: string, maxLength: 500}
+    Line:
+      allOf:
+        - $ref: "#/components/schemas/LineInput"
+        - type: object
+          required: [lineId, receipts]
+          properties:
+            lineId: {type: string}
+            receipts: {type: array, items: {$ref: "#/components/schemas/Receipt"}}
+    ReceiptUploadRequest:
+      type: object
+      required: [mimeType, sizeBytes, sha256]
+      properties:
+        mimeType: {type: string, enum: [image/jpeg, image/png, image/heic, application/pdf]}
+        sizeBytes: {type: integer, minimum: 1, maximum: 10485760}
+        sha256: {type: string, pattern: "^[A-Fa-f0-9]{64}$"}
+    ReceiptUploadSlot:
+      type: object
+      required: [receiptId, uploadUrl, fields, expiresInSeconds]
+      properties:
+        receiptId: {type: string}
+        uploadUrl: {type: string, format: uri}
+        fields: {type: object, additionalProperties: {type: string}}
+        expiresInSeconds: {type: integer, example: 300}
+    Receipt:
+      type: object
+      required: [receiptId, status, mimeType, sizeBytes]
+      properties:
+        receiptId: {type: string}
+        status: {type: string, enum: [PENDING_UPLOAD, SCANNING, CLEAN, REJECTED, EXPIRED]}
+        mimeType: {type: string}
+        sizeBytes: {type: integer}
+        rejectReason: {type: string, enum: [MALWARE, BAD_TYPE, SCAN_TIMEOUT]}
+        duplicateOf: {type: string, description: "Claim reference of the other claim with the same file"}
+    Claim:
+      type: object
+      required: [claimId, status, lines]
+      properties:
+        claimId: {type: string}
+        claimRef: {type: string, example: CLM-2026-000001, description: "Set at submit"}
+        status: {$ref: "#/components/schemas/Status"}
+        totalInr: {type: number}
+        totalsByCurrency: {type: object, additionalProperties: {type: number}}
+        createdAt: {type: string, format: date-time}
+        submittedAt: {type: string, format: date-time}
+        lines: {type: array, items: {$ref: "#/components/schemas/Line"}}
+    ClaimPage:
+      type: object
+      required: [items]
+      properties:
+        items: {type: array, items: {$ref: "#/components/schemas/Claim"}}
+        nextCursor: {type: string}
