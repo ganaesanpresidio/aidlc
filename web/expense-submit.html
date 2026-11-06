@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Expense submission test page</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1d2430; --muted: #5b6573; --line: #d9dee5;
+    --accent: #1f5fd1; --accent-text: #ffffff; --ok: #1a7f37; --warn: #9a6700; --bad: #c62828;
+    --ok-bg: #e6f4ea; --warn-bg: #fff4d6; --bad-bg: #fdeaea; --info-bg: #e8eefc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #14171c; --card: #1c2027; --text: #e6e9ee; --muted: #9aa4b2; --line: #333a45;
+      --accent: #6ea0ff; --accent-text: #0b1220; --ok: #5fd07a; --warn: #f0c14b; --bad: #ff8a80;
+      --ok-bg: #1b3324; --warn-bg: #3a3118; --bad-bg: #3a1d1d; --info-bg: #1d2a47; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.35rem; margin: 8px 0 2px; }
+  h2 { font-size: 1.05rem; margin: 0 0 10px; }
+  .sub { color: var(--muted); margin: 0 0 14px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 3px; }
+  input, select, textarea, button { font: inherit; color: inherit; }
+  input, select, textarea { width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--card); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-bg); }
+  .grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+  .wide { grid-column: 1 / -1; }
+  .field small.err { display: block; color: var(--bad); min-height: 1.1em; font-size: .8rem; margin-top: 2px; }
+  .field small.hint { display: block; color: var(--muted); font-size: .8rem; margin-top: 2px; }
+  button { padding: 8px 14px; border-radius: 7px; border: 1px solid var(--line); background: var(--card); cursor: pointer; }
+  button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 600; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .78rem; border: 1px solid var(--line); }
+  .chip.ok { background: var(--ok-bg); color: var(--ok); } .chip.warn { background: var(--warn-bg); color: var(--warn); }
+  .chip.bad { background: var(--bad-bg); color: var(--bad); } .chip.info { background: var(--info-bg); color: var(--accent); }
+  .banner { padding: 9px 12px; border-radius: 8px; margin: 10px 0 0; font-size: .92rem; }
+  .banner.ok { background: var(--ok-bg); color: var(--ok); } .banner.bad { background: var(--bad-bg); color: var(--bad); }
+  .banner.warn { background: var(--warn-bg); color: var(--warn); } .banner.info { background: var(--info-bg); }
+  .line { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-top: 10px; }
+  .line.flagged { border-color: var(--bad); background: var(--bad-bg); }
+  .line header { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .receipt { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; font-size: .88rem; }
+  .muted { color: var(--muted); }
+  details summary { cursor: pointer; }
+  pre { margin: 6px 0 0; padding: 8px; background: var(--bg); border-radius: 7px; overflow: auto; max-height: 260px; font-size: .78rem; }
+  .logrow { border-top: 1px solid var(--line); padding: 4px 0; font-size: .82rem; }
+  .sr { position: absolute; left: -9999px; }
+  @media (max-width: 520px) { main { padding: 10px; } section { padding: 12px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Expense submission test page</h1>
+  <p class="sub">Quick checks of the <code>submit</code> unit in a lower environment. Do not enter real receipts or personal data.</p>
+  <div id="envBanner" class="banner info" role="status">Checking connection…</div>
+
+  <section aria-labelledby="h-settings">
+    <details id="settings">
+      <summary><strong id="h-settings">Connection and sign-in</strong> <span class="muted">(click to change)</span></summary>
+      <div class="grid" style="margin-top:10px">
+        <div class="field wide"><label for="baseUrl">API base URL</label>
+          <input id="baseUrl" placeholder="same origin (leave empty), or https://dev.example.com">
+          <small class="hint">Another origin needs CORS enabled on that API. The mock server on this page needs nothing.</small></div>
+        <div class="field"><label for="authMode">Sign-in method</label>
+          <select id="authMode"><option value="dev">Dev headers (mock server only)</option><option value="bearer">Bearer token (JWT)</option></select></div>
+        <div class="field" id="devUserBox"><label for="devUser">Employee id</label><input id="devUser" value="emp-asha" autocomplete="off"></div>
+        <div class="field" id="devGradeBox"><label for="devGrade">Grade</label>
+          <select id="devGrade"><option>G1</option><option>G2</option><option>G3</option></select></div>
+        <div class="field wide" id="tokenBox" hidden><label for="token">Bearer token</label>
+          <input id="token" type="password" autocomplete="off" placeholder="paste a test token. It stays in this page only"></div>
+        <div class="field wide"><label><input type="checkbox" id="bypass" style="width:auto"> Test mode: skip this page's checks and send whatever I type, to see the server's own errors</label></div>
+      </div>
+    </details>
+  </section>
+
+  <section aria-labelledby="h-claim">
+    <h2 id="h-claim">1. Claim</h2>
+    <div class="row">
+      <button class="primary" id="createClaim">Create new claim</button>
+      <span id="claimInfo" class="muted">No claim yet.</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-line" id="lineSection" hidden>
+    <h2 id="h-line">2. Add an expense line</h2>
+    <form id="lineForm" novalidate>
+      <div class="grid">
+        <div class="field"><label for="expenseDate">Expense date *</label><input id="expenseDate" type="date"><small class="err" data-for="expenseDate"></small></div>
+        <div class="field"><label for="category">Category *</label>
+          <select id="category"><option value="">Choose…</option><option>Travel</option><option>Accommodation</option><option>Meals</option><option>Mileage</option><option>Other</option></select>
+          <small class="err" data-for="category"></small></div>
+        <div class="field"><label for="amount">Amount *</label><input id="amount" inputmode="decimal" placeholder="0.00" autocomplete="off"><small class="err" data-for="amount"></small></div>
+        <div class="field"><label for="currency">Currency *</label><input id="currency" value="INR" maxlength="3" autocomplete="off"><small class="err" data-for="currency"></small></div>
+        <div class="field" id="inrBox" hidden><label for="amountInr">Amount in INR *</label><input id="amountInr" inputmode="decimal" autocomplete="off">
+          <small class="hint">Needed when the currency is not INR. Finance checks it at payment.</small><small class="err" data-for="amountInr"></small></div>
+        <div class="field" id="qtyBox" hidden><label for="quantity" id="qtyLabel">Quantity</label><input id="quantity" inputmode="decimal" autocomplete="off"><small class="err" data-for="quantity"></small></div>
+        <div class="field wide"><label for="description">Description * <span class="muted" id="descCount">0/500</span></label>
+          <input id="description" maxlength="600" autocomplete="off"><small class="err" data-for="description"></small></div>
+        <div class="field wide"><label for="exceptionReason">Reason, only if the amount is above your limit (optional)</label>
+          <input id="exceptionReason" maxlength="600" autocomplete="off"><small class="err" data-for="exceptionReason"></small></div>
+      </div>
+      <div class="row" style="margin-top:10px"><button class="primary" type="submit">Add line</button><span id="lineHint" class="muted"></span></div>
+    </form>
+  </section>
+
+  <section aria-labelledby="h-lines" id="linesSection" hidden>
+    <h2 id="h-lines">3. Lines and receipts</h2>
+    <div id="lines"></div>
+    <p class="muted" id="totals"></p>
+  </section>
+
+  <section aria-labelledby="h-submit" id="submitSection" hidden>
+    <h2 id="h-submit">4. Submit</h2>
+    <div class="row"><button class="primary" id="submitBtn">Submit claim</button><button id="withdrawBtn" hidden>Withdraw claim</button><button id="refreshBtn">Refresh from server</button></div>
+    <div id="result" aria-live="polite"></div>
+  </section>
+
+  <section aria-labelledby="h-log">
+    <details><summary><strong id="h-log">Request log</strong> <span class="muted" id="logCount">(0)</span></summary><div id="log"></div></details>
+  </section>
+</main>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const CATEGORIES = ["Travel", "Accommodation", "Meals", "Mileage", "Other"];
+const MIME = { "image/jpeg": ["jpg", "jpeg"], "image/png": ["png"], "image/heic": ["heic"], "application/pdf": ["pdf"] };
+const MAX_BYTES = 10 * 1024 * 1024, MAX_RECEIPTS = 5, RECEIPT_THRESHOLD = 1000, WINDOW_DAYS = 30;
+const state = { claim: null, busy: false, flagged: {}, logN: 0 };
+
+/* ---------- helpers ---------- */
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) { if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v); }
+  kids.flat().forEach((c) => c != null && n.append(c.nodeType ? c : document.createTextNode(String(c))));
+  return n;
+};
+const newKey = () => "ui-" + (crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2)).slice(0, 40);
+const bypass = () => $("bypass").checked;
+const inr = (n) => "₹" + Number(n).toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const today = () => new Date().toISOString().slice(0, 10);
+
+/* ---------- settings ---------- */
+function loadSettings() {
+  try { const s = JSON.parse(sessionStorage.getItem("expenseTestSettings") || "{}");
+    ["baseUrl", "authMode", "devUser", "devGrade"].forEach((k) => s[k] && ($(k).value = s[k])); } catch (_) { /* storage may be blocked */ }
+  syncAuthBoxes();
+}
+function saveSettings() {
+  try { sessionStorage.setItem("expenseTestSettings", JSON.stringify(Object.fromEntries(["baseUrl", "authMode", "devUser", "devGrade"].map((k) => [k, $(k).value])))); } catch (_) {}
+}
+function syncAuthBoxes() {
+  const dev = $("authMode").value === "dev";
+  $("devUserBox").hidden = $("devGradeBox").hidden = !dev; $("tokenBox").hidden = dev;
+}
+
+/* ---------- API ---------- */
+function headers(extra = {}) {
+  const h = { "content-type": "application/json", ...extra };
+  if ($("authMode").value === "dev") { h["X-Dev-User"] = $("devUser").value.trim(); h["X-Dev-Grade"] = $("devGrade").value; }
+  else if ($("token").value.trim()) h["Authorization"] = "Bearer " + $("token").value.trim();
+  return h;
+}
+async function api(method, path, body, extraHeaders) {
+  const url = ($("baseUrl").value.trim().replace(/\/$/, "")) + path;
+  const t0 = performance.now();
+  let res, data = null;
+  try { res = await fetch(url, { method, headers: headers(extraHeaders), body: body === undefined ? undefined : JSON.stringify(body), redirect: "manual" }); }
+  catch (e) { logReq(method, path, "network error", body, String(e)); throw { status: 0, code: "NETWORK", message: "Could not reach the API. Check the base URL and that the server is running." }; }
+  const text = await res.text();
+  try { data = text ? JSON.parse(text) : null; } catch (_) { data = text; }
+  logReq(method, path, res.status, body, data, Math.round(performance.now() - t0));
+  if (res.type === "opaqueredirect" || res.status === 302) return { status: 302, data: null };
+  if (!res.ok) throw { status: res.status, ...(data && typeof data === "object" ? data : { message: String(data) }) };
+  return { status: res.status, data };
+}
+function logReq(method, path, status, body, data, ms) {
+  state.logN += 1; $("logCount").textContent = `(${state.logN})`;
+  const row = el("div", { class: "logrow" }, el("strong", { text: `${method} ${path}` }), ` → `, el("span", { class: "chip " + (status >= 200 && status < 300 ? "ok" : "bad"), text: String(status) }), ms ? ` ${ms} ms` : "",
+    el("details", {}, el("summary", { text: "details" }), el("pre", { text: JSON.stringify({ request: body ?? null, response: data }, null, 2) })));
+  $("log").prepend(row);
+}
+
+/* ---------- validation (mirrors the server, which stays the final judge) ---------- */
+const AMOUNT = /^\d{1,8}(\.\d{1,2})?$/;
+function checkAmount(v, label, { allowZero = false } = {}) {
+  v = v.trim();
+  if (!v) return `${label} is required`;
+  if (!AMOUNT.test(v)) return `${label}: use a number with at most 2 decimals, up to 99999999.99`;
+  const n = Number(v);
+  if (n > 99999999.99) return `${label} must not exceed 99999999.99`;
+  if (!allowZero && n <= 0) return `${label} must be above zero`;
+  return "";
+}
+function lineValues() {
+  const cur = $("currency").value.trim().toUpperCase() || "INR";
+  return { expenseDate: $("expenseDate").value, category: $("category").value, amount: $("amount").value.trim(), currency: cur,
+    amountInr: $("amountInr").value.trim(), quantity: $("quantity").value.trim(), description: $("description").value.trim(), exceptionReason: $("exceptionReason").value.trim() };
+}
+function validateLine(v) {
+  const e = {};
+  if (!v.expenseDate) e.expenseDate = "Pick the expense date";
+  else if (v.expenseDate > today()) e.expenseDate = "The date is in the future. Policy will refuse it at submit";
+  if (!CATEGORIES.includes(v.category)) e.category = "Choose a category";
+  const a = checkAmount(v.amount, "Amount"); if (a) e.amount = a;
+  if (!/^[A-Z]{3}$/.test(v.currency)) e.currency = "Use a 3-letter code such as INR or USD";
+  if (v.currency !== "INR") { const r = checkAmount(v.amountInr, "Amount in INR"); if (r) e.amountInr = r; }
+  if (v.category === "Mileage") { const q = checkAmount(v.quantity, "Kilometres"); if (q) e.quantity = q; }
+  else if (v.quantity) { const q = checkAmount(v.quantity, "Quantity", { allowZero: true }); if (q) e.quantity = q; }
+  if (!v.description) e.description = "Describe the expense";
+  else if (v.description.length > 500) e.description = "At most 500 characters";
+  if (v.exceptionReason.length > 500) e.exceptionReason = "At most 500 characters";
+  return e;
+}
+function showErrors(errs) {
+  document.querySelectorAll("#lineForm [data-for]").forEach((s) => { const f = s.dataset.for, msg = errs[f] || "";
+    s.textContent = msg; const inp = $(f); if (inp) { if (msg) inp.setAttribute("aria-invalid", "true"); else inp.removeAttribute("aria-invalid"); } });
+}
+function ageDays(d) { return Math.floor((new Date(today()) - new Date(d)) / 86400000); }
+function needsReceipt(l) { return l.currency !== "INR" || Number(l.amount) >= RECEIPT_THRESHOLD; }
+function qtyLabel(cat) { return { Accommodation: "Nights (default 1)", Meals: "Days (default 1)", Mileage: "Kilometres *" }[cat] || "Quantity"; }
+function syncLineForm() {
+  const cur = $("currency").value.trim().toUpperCase(); $("inrBox").hidden = !cur || cur === "INR";
+  const cat = $("category").value; $("qtyBox").hidden = !["Accommodation", "Meals", "Mileage"].includes(cat); $("qtyLabel").textContent = qtyLabel(cat);
+  $("descCount").textContent = `${$("description").value.length}/500`;
+  const amt = Number($("amount").value), hints = [];
+  if ($("expenseDate").value && ageDays($("expenseDate").value) > WINDOW_DAYS) hints.push("Older than 30 days: policy will refuse it.");
+  if (amt >= RECEIPT_THRESHOLD || ($("inrBox").hidden === false)) hints.push("This line will need a receipt.");
+  $("lineHint").textContent = hints.join(" ");
+}
+
+/* ---------- rendering ---------- */
+function setBusy(b) { state.busy = b; document.querySelectorAll("button").forEach((x) => { if (!x.dataset.keep) x.disabled = b; }); }
+function banner(box, kind, text) {
+  if (box.classList.contains("banner")) { box.className = "banner " + kind; box.textContent = text; return box; }  // the page-level status bar is already a banner
+  box.replaceChildren(el("div", { class: "banner " + kind, role: kind === "bad" ? "alert" : "status", text }));
+}
+function chip(status) { const k = { CLEAN: "ok", SCANNING: "warn", PENDING_UPLOAD: "warn", REJECTED: "bad", EXPIRED: "info" }[status] || "info"; return el("span", { class: "chip " + k, text: status }); }
+const REASONS = { MALWARE: "A security scan blocked this file", BAD_TYPE: "The file is not really that type", SCAN_TIMEOUT: "The scan took too long", SCAN_FAILED: "The scan could not run" };
+function render() {
+  const c = state.claim; const has = !!c;
+  ["lineSection", "linesSection", "submitSection"].forEach((s) => ($(s).hidden = !has));
+  if (!has) return;
+  const editable = c.status === "Draft";
+  $("claimInfo").replaceChildren(el("span", { class: "chip info", text: c.status }), " ", c.claimRef ? el("strong", { text: c.claimRef }) : "", c.claimRef ? " " : "", el("span", { class: "muted", text: "id " + c.claimId }));
+  $("lineSection").hidden = !editable; $("submitBtn").hidden = !editable; $("withdrawBtn").hidden = c.status !== "Submitted";
+  const box = $("lines"); box.replaceChildren();
+  if (!c.lines.length) box.append(el("p", { class: "muted", text: "No lines yet." }));
+  c.lines.forEach((l, i) => box.append(renderLine(l, i, editable)));
+  const t = Object.entries(c.totalsByCurrency || {}).map(([k, v]) => `${k} ${Number(v).toLocaleString("en-IN")}`).join(" + ");
+  $("totals").textContent = t ? `Total: ${t}` + (c.totalInr != null ? ` (${inr(c.totalInr)} for approval)` : "") : "";
+}
+function renderLine(l, i, editable) {
+  const flag = state.flagged[l.lineId];
+  const head = el("header", {}, el("strong", { text: `Line ${i + 1}: ${l.category}  ${l.currency} ${l.amount}` + (l.currency !== "INR" ? ` (≈ ${inr(l.amountInr)})` : "") }), el("span", { class: "muted", text: l.expenseDate }));
+  const kids = [head, el("div", { class: "muted", text: l.description + (l.quantity ? `  · qty ${l.quantity}` : "") + (l.exceptionReason ? `  · reason: ${l.exceptionReason}` : "") })];
+  if (flag) kids.push(el("div", { class: "banner bad", role: "alert", text: flag }));
+  else if (needsReceipt(l) && !l.receipts.some((r) => r.status === "CLEAN")) kids.push(el("div", { class: "chip warn", text: "Needs a receipt" }));
+  l.receipts.forEach((r) => kids.push(el("div", { class: "receipt" }, chip(r.status), `${r.mimeType} · ${(r.sizeBytes / 1024).toFixed(1)} KB`,
+    r.rejectReason ? el("span", { class: "muted", text: REASONS[r.rejectReason] || r.rejectReason }) : "",
+    r.duplicateOf ? el("span", { class: "chip warn", text: `Same file is on claim ${r.duplicateOf}` }) : "",
+    editable ? el("button", { type: "button", "data-act": "rm-receipt", "data-line": l.lineId, "data-id": r.receiptId, text: "Remove" }) : "")));
+  if (editable) {
+    const live = l.receipts.filter((r) => !["REJECTED", "EXPIRED"].includes(r.status)).length;
+    const file = el("input", { type: "file", accept: Object.keys(MIME).join(",") + ",.heic", "aria-label": `Add a receipt to line ${i + 1}`, "data-line": l.lineId });
+    file.disabled = live >= MAX_RECEIPTS && !bypass();
+    file.addEventListener("change", () => file.files[0] && attach(l, file.files[0], file));
+    kids.push(el("div", { class: "row", style: "margin-top:8px" }, file, el("button", { type: "button", "data-act": "rm-line", "data-line": l.lineId, text: "Remove line" }),
+      el("span", { class: "muted", text: `${live}/${MAX_RECEIPTS} receipts · JPEG, PNG, HEIC or PDF, up to 10 MB` })));
+  }
+  return el("div", { class: "line" + (flag ? " flagged" : "") }, kids);
+}
+
+/* ---------- actions ---------- */
+async function refresh() { if (!state.claim) return; state.claim = (await api("GET", `/v1/claims/${state.claim.claimId}`)).data; render(); }
+async function run(fn, resultBox) {
+  if (state.busy) return; setBusy(true);
+  try { await fn(); } catch (e) { reportError(e, resultBox); } finally { setBusy(false); render(); }
+}
+function reportError(e, box = $("result")) {
+  let text = e.message || "Something went wrong";
+  if (e.status) text = `${e.status} ${e.code || ""}: ${text}`;
+  if (e.status === 401) text += " (check the sign-in settings)";
+  banner(box, "bad", text);
+  const details = (e.details || []).filter((d) => (d.message || d.code) !== e.message);
+  if (details.length) {
+    const ul = el("ul", { style: "margin:6px 0 0 18px;padding:0" });
+    details.forEach((d) => { ul.append(el("li", { text: `${d.message || d.code}${d.lineId ? ` (line ${lineNo(d.lineId)})` : ""}` }));
+      if (d.lineId) state.flagged[d.lineId] = [state.flagged[d.lineId], d.message || d.code].filter(Boolean).join(" · "); });
+    box.firstChild.append(ul);
+  }
+}
+const lineNo = (id) => (state.claim ? state.claim.lines.findIndex((l) => l.lineId === id) + 1 : "?");
+
+$("createClaim").addEventListener("click", () => run(async () => { state.flagged = {}; $("result").replaceChildren();
+  state.claim = (await api("POST", "/v1/claims")).data; $("expenseDate").value ||= today(); }, $("claimInfo")));
+
+$("lineForm").addEventListener("submit", (ev) => { ev.preventDefault(); run(async () => {
+  const v = lineValues(); const errs = validateLine(v); showErrors(bypass() ? {} : errs);
+  if (!bypass() && Object.keys(errs).length) { document.querySelector('#lineForm [aria-invalid="true"]')?.focus(); return; }
+  const body = { expenseDate: v.expenseDate, category: v.category, amount: bypass() ? v.amount : Number(v.amount), currency: v.currency, description: v.description };
+  if (v.currency !== "INR" && v.amountInr) body.amountInr = bypass() ? v.amountInr : Number(v.amountInr);
+  if (v.quantity) body.quantity = bypass() ? v.quantity : Number(v.quantity);
+  if (v.exceptionReason) body.exceptionReason = v.exceptionReason;
+  await api("POST", `/v1/claims/${state.claim.claimId}/lines`, body);
+  ["amount", "amountInr", "quantity", "description", "exceptionReason"].forEach((k) => ($(k).value = "")); showErrors({}); syncLineForm();
+  await refresh(); }, $("lineHint")); });
+
+$("lines").addEventListener("click", (ev) => { const b = ev.target.closest("button[data-act]"); if (!b) return;
+  run(async () => {
+    if (b.dataset.act === "rm-line") await api("DELETE", `/v1/claims/${state.claim.claimId}/lines/${b.dataset.line}`);
+    if (b.dataset.act === "rm-receipt") await api("DELETE", `/v1/claims/${state.claim.claimId}/lines/${b.dataset.line}/receipts/${b.dataset.id}`);
+    await refresh(); }); });
+
+async function sha256Hex(buf) { const d = await crypto.subtle.digest("SHA-256", buf); return [...new Uint8Array(d)].map((x) => x.toString(16).padStart(2, "0")).join(""); }
+function fileMime(f) { if (f.type) return f.type; const ext = f.name.split(".").pop().toLowerCase(); return Object.keys(MIME).find((m) => MIME[m].includes(ext)) || ""; }
+function attach(line, file, input) { run(async () => {
+  const mime = fileMime(file);
+  if (!bypass()) {
+    if (!MIME[mime]) throw { message: "Use JPEG, PNG, HEIC or PDF" };
+    if (file.size < 1 || file.size > MAX_BYTES) throw { message: "Files can be at most 10 MB" };
+  }
+  let buf, sha = "0".repeat(64);
+  buf = await file.arrayBuffer();
+  if (crypto.subtle) sha = await sha256Hex(buf); else throw { message: "This browser cannot hash files here. Use localhost or https" };
+  const slot = (await api("POST", `/v1/claims/${state.claim.claimId}/lines/${line.lineId}/receipts`, { mimeType: mime, sizeBytes: file.size, sha256: sha })).data;
+  if (slot.uploadUrl.startsWith("mock://")) {
+    const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+    await api("POST", `/dev/uploads/${state.claim.claimId}/${slot.receiptId}`, { contentBase64: b64, contentType: mime });
+  } else {
+    const fd = new FormData(); Object.entries(slot.fields).forEach(([k, v]) => fd.append(k, v)); fd.append("file", new Blob([buf], { type: mime }), file.name);
+    const r = await fetch(slot.uploadUrl, { method: "POST", body: fd }); logReq("POST", "(storage upload)", r.status, null, null);
+    if (!r.ok) throw { message: `The upload was refused (${r.status}). Check the file type and size` };
+  }
+  input.value = ""; await refresh(); }, $("result")); }
+
+$("submitBtn").addEventListener("click", () => run(async () => {
+  state.flagged = {}; $("result").replaceChildren(); const c = state.claim;
+  if (!bypass()) {
+    if (!c.lines.length) throw { message: "Add at least one expense line first" };
+    if (c.lines.some((l) => l.receipts.some((r) => ["SCANNING", "PENDING_UPLOAD"].includes(r.status)))) throw { message: "Receipt still being checked. Try again in a moment" };
+    const missing = c.lines.filter((l) => needsReceipt(l) && !l.receipts.some((r) => r.status === "CLEAN"));
+    if (missing.length) { missing.forEach((l) => (state.flagged[l.lineId] = "Add a receipt")); throw { message: "Some lines need a receipt (₹1,000 or more, or not in INR)" }; }
+  }
+  const out = (await api("POST", `/v1/claims/${c.claimId}/submit`, undefined, { "Idempotency-Key": newKey() })).data;
+  state.claim = out; banner($("result"), "ok", `Submitted. Your reference is ${out.claimRef}. Total ${inr(out.totalInr)}.`); }));
+
+$("withdrawBtn").addEventListener("click", () => run(async () => { state.claim = (await api("POST", `/v1/claims/${state.claim.claimId}/withdraw`)).data; banner($("result"), "info", "Claim withdrawn."); }));
+$("refreshBtn").addEventListener("click", () => run(refresh));
+
+["expenseDate", "category", "amount", "currency", "amountInr", "quantity", "description", "exceptionReason"].forEach((id) => $(id).addEventListener("input", syncLineForm));
+$("currency").addEventListener("input", () => { $("currency").value = $("currency").value.toUpperCase(); });
+["baseUrl", "authMode", "devUser", "devGrade"].forEach((id) => $(id).addEventListener("change", () => { saveSettings(); syncAuthBoxes(); ping(); }));
+$("bypass").addEventListener("change", render);
+
+async function ping() {
+  try { await api("GET", "/v1/claims?limit=1"); banner($("envBanner"), "ok", "Connected" + ($("authMode").value === "dev" ? " (dev headers)." : " (bearer token)."));
+  }
+  catch (e) { banner($("envBanner"), e.status === 401 ? "warn" : "bad", e.status === 401 ? "Reached the API, but sign-in was refused. Open “Connection and sign-in”." : (e.message || "Not connected")); }
+}
+loadSettings(); syncLineForm(); ping();
+</script>
+</body>
+</html>

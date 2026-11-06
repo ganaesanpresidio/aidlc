@@ -18,6 +18,11 @@ dependencies = [
 [project.scripts]
 aidlc-e2e = "aidlc_e2e:main"
 
+[project.optional-dependencies]
+aws = [
+    "boto3>=1.43.123",
+]
+
 [build-system]
 requires = ["uv_build>=0.13.6,<0.14.0"]
 build-backend = "uv_build"
@@ -25,3 +30,31 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 # src/ is reserved for the platform units (see docs/00-overview.md)
 module-root = "tools"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.3",
+]
+
+[tool.pytest.ini_options]
+# Units live in src/<unit>, shared adapters in libs/, helper tools in tools/. Not installed as packages yet.
+pythonpath = ["src", "libs", "tools"]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["src", "libs"]
+branch = true
+
+[tool.ruff]
+line-length = 130
+src = ["src", "libs", "tools", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "I"]
+ignore = ["E501", "B008", "UP037", "E731", "B023"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E741"]  # short names like `l` for a line are clear in tests

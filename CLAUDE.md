@@ -37,7 +37,11 @@ docs/                 Playbook (this is the source of truth for the method)
   3-deploy-monitor/   DEP-01 … DEP-02
 aidlc-docs/           Project artifacts created while running the playbook (created on first use)
 .claude/              Shared Claude Code settings; hooks/ holds the 8 gate scripts (not enabled yet)
-tools/                Python helper tools for the playbook (uv project; src/ is reserved for platform units)
+tools/                Python helper tools for the playbook (uv project)
+src/<unit>/           Platform units in Python (policy, submit built so far); gated by lld-<unit>.md
+libs/aidlc_common/    Shared adapters: backend flag, events, audit, clock, safe logging (no business rules)
+web/                  Test page for the submit unit (web/expense-submit.html); real screens come later (Q47)
+tests/                pytest suites for the units, the shared libs and cross-unit contracts
 ```
 
 ## Writing or editing docs
@@ -53,4 +57,17 @@ tools/                Python helper tools for the playbook (uv project; src/ is 
 npx markdownlint-cli2 "**/*.md"   # lint docs
 uv sync                            # set up Python env
 uv run aidlc-e2e                   # run helper tools
+uv run pytest                      # all tests (mock backend, no AWS)
+uv run pytest --cov                # with coverage
+uv run ruff check src libs tools tests
+uv run aidlc-e2e demo              # one full claim journey, printed
+uv run aidlc-e2e serve policy      # policy unit on :8101 (mock backend only)
+uv run aidlc-e2e serve submit      # submit unit on :8102, test page at http://127.0.0.1:8102/ (mock backend only)
+uv run aidlc-e2e design            # validate OpenAPI and event schemas
 ```
+
+## Backends
+
+`AIDLC_BACKEND=mock` (default) keeps every database, file, event and scan call in memory: no AWS login needed.
+`AIDLC_BACKEND=aws` switches to the real boto3 adapters. They are not yet verified against AWS.
+Never run the local servers with `aws`: they trust dev headers and refuse to start.

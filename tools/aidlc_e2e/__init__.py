@@ -4,10 +4,20 @@ from aidlc_e2e.config import ENV_FILE, aws_settings, jira_settings
 
 
 def main() -> None:
-    """`uv run aidlc-e2e [check]` — show the Jira settings (token masked); `check` also tests the connection; `publish [title-text]` creates the mock policy and approval matrix pages in Confluence; `design` validates OpenAPI and event schemas; `rules` validates the policy rules config and routes sample claims.
+    """`uv run aidlc-e2e [check]` — show the Jira settings (token masked); `check` also tests the connection; `publish [title-text]` creates the mock policy and approval matrix pages in Confluence; `serve policy|submit` runs a unit locally (mock backend); `demo` prints one full journey; `design` validates OpenAPI and event schemas; `rules` validates the policy rules config and routes sample claims.
 
     Use another env file with AIDLC_ENV_FILE, e.g. `AIDLC_ENV_FILE=env.dev uv run aidlc-e2e check`.
     """
+    if sys.argv[1:2] == ["serve"]:
+        from aidlc_e2e.local import serve
+
+        serve(sys.argv[2] if len(sys.argv) > 2 else "", int(sys.argv[3]) if len(sys.argv) > 3 else None)
+        return
+    if sys.argv[1:2] == ["demo"]:
+        from aidlc_e2e.local import demo
+
+        demo()
+        return
     if sys.argv[1:2] == ["design"]:
         from aidlc_e2e.design_check import run as run_design
 

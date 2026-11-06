@@ -12,7 +12,7 @@ owner: Solution Owner
 One page linking the requirement to its user stories, Jira issues, Confluence pages and every artifact created so far. Update it whenever an activity adds material.
 
 **Requirement:** Employees can submit expenses with receipt attachments ([intent](inception/intent.md)).
-**Status:** DIS-01 approved. DIS-02 approved (policy values are MOCK). DIS-03 approved. DIS-04 HLD and LLDs for `policy` and `submit` drafted.
+**Status:** DIS-01 approved. DIS-02 approved (policy values are MOCK). DIS-03 approved. DIS-04 LLDs for `policy` and `submit` approved. BLD-01 built on the mock backend.
 
 ## 1. User stories and Jira
 
@@ -98,6 +98,18 @@ The domain model and ADRs are not published to Confluence yet (DIS-02 step 9).
 | LLD approvals (PENDING) | [lld-policy.md](approvals/lld-policy.md), [lld-submit.md](approvals/lld-submit.md) |
 | LLD for `approve`, `payout`, `ocr`, `bi` | not started |
 
+### BLD-01 · Build (mock backend, runs locally)
+
+| Artifact | Path |
+| --- | --- |
+| `policy` code | [../src/policy/](../src/policy/) |
+| `submit` code | [../src/submit/](../src/submit/) |
+| Shared adapters (backend flag, events, audit, clock, safe logging) | [../libs/aidlc_common/](../libs/aidlc_common/) |
+| Tests (unit, edge cases, integration, contracts) | [../tests/](../tests/) |
+| Test page for the submit unit | [../web/expense-submit.html](../web/expense-submit.html) |
+| Build notes: `policy` | [design/policy/build-notes.md](design/policy/build-notes.md) |
+| Build notes: `submit` | [design/submit/build-notes.md](design/submit/build-notes.md) |
+
 ### Tooling
 
 | Tool | Path | Command |
@@ -107,6 +119,7 @@ The domain model and ADRs are not published to Confluence yet (DIS-02 step 9).
 | Rules validation and sample claims | [../tools/aidlc_e2e/rules_check.py](../tools/aidlc_e2e/rules_check.py) | `uv run aidlc-e2e rules` |
 | Confluence publisher | [../tools/aidlc_e2e/confluence.py](../tools/aidlc_e2e/confluence.py) | `AIDLC_ENV_FILE=env.dev uv run aidlc-e2e publish` |
 | Contract validation (OpenAPI, event schemas) | [../tools/aidlc_e2e/design_check.py](../tools/aidlc_e2e/design_check.py) | `uv run aidlc-e2e design` |
+| Local servers and demo | [../tools/aidlc_e2e/local.py](../tools/aidlc_e2e/local.py) | `uv run aidlc-e2e serve policy`, `serve submit`, `demo` |
 
 ## 4. Requirement to artifact map
 
@@ -119,7 +132,7 @@ The domain model and ADRs are not published to Confluence yet (DIS-02 step 9).
 
 ## 5. Open items
 
-All are recorded as assumptions, questions and risks in the [question log](inception/question-log.md): Q18 to Q47 and risks R2, R3. Summary:
+All are recorded as assumptions, questions and risks in the [question log](inception/question-log.md): Q18 to Q49 and risks R2, R3. Summary:
 
 - Replace MOCK policy values with the real policy before go-live.
 - Compliance to confirm 1-year retention (risk R1).

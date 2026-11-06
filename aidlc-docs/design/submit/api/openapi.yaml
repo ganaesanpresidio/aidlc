@@ -205,7 +205,7 @@ components:
         status: {type: string, enum: [PENDING_UPLOAD, SCANNING, CLEAN, REJECTED, EXPIRED]}
         mimeType: {type: string}
         sizeBytes: {type: integer}
-        rejectReason: {type: string, enum: [MALWARE, BAD_TYPE, SCAN_TIMEOUT]}
+        rejectReason: {type: string, enum: [MALWARE, BAD_TYPE, SCAN_TIMEOUT, SCAN_FAILED]}
         duplicateOf: {type: string, description: "Claim reference of the other claim with the same file"}
     Claim:
       type: object

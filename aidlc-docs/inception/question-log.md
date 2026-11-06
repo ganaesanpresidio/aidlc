@@ -3,7 +3,7 @@ id: QLOG-001
 title: Question log — Submit expenses with receipt attachments
 activity: DIS-01
 status: DIS-01 approved. DIS-02 and DIS-03 assumptions open
-version: 0.5.0
+version: 0.6.0
 last_updated: 2026-11-04
 owner: Solution Owner
 ---
@@ -103,6 +103,8 @@ Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs 
 | Q45 | Who can read the policy rules? | Every signed-in user, because limits are not secret | ASSUMPTION |
 | Q46 | Can rules be back-dated? | No. Versions are immutable and move forward only | ASSUMPTION |
 | Q47 | Who builds the web app? | One web app. Each unit's bolts add its screens, reviewed by the front-end developer | ASSUMPTION |
+| Q48 | Which calendar does "today" follow? | The company day in India (`AIDLC_TIMEZONE`, default Asia/Kolkata), for rule dates, the 30-day window and claim references | ASSUMPTION |
+| Q49 | Are there safety limits on claim data? | Yes, as guards: at most 50 lines per claim, amounts up to 99,999,999.99 with 2 decimals, any number above 10^15 refused | ASSUMPTION |
 
 ## Risks raised
 
@@ -116,7 +118,7 @@ Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs 
 
 | Status | Count |
 | --- | --- |
-| ASSUMPTION | 42 (Q1–Q7, Q9, Q10, Q14–Q34, Q36–Q47) |
+| ASSUMPTION | 44 (Q1–Q7, Q9, Q10, Q14–Q34, Q36–Q49) |
 | OPEN QUESTION | 1 (Q35) |
 | CONFIRMED | 4 (Q8, Q11, Q12, Q13) |
 | Risks | 3 (R1 to R3) |
@@ -130,3 +132,4 @@ Owner Architect, with Compliance for Q24 and Q25. Due before the units and NFRs 
 | 0.3.0 | 2026-11-03 | Claude (proposed) | Added Batch E (Q18 to Q23, DIS-02) and Batch F (Q24 to Q36, DIS-03), risks R2 and R3 |
 | 0.4.0 | 2026-11-03 | Claude (proposed) | Added Q37 (SSO) and Q38 (AWS accounts) from the HLD |
 | 0.5.0 | 2026-11-04 | Claude (proposed) | Added Q39 to Q47 from the policy and submit LLDs |
+| 0.6.0 | 2026-11-04 | Claude (proposed) | Added Q48 (business calendar) and Q49 (data guards) from the build |

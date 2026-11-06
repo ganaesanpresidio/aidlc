@@ -45,14 +45,14 @@ def route(rules: dict, claim: dict) -> dict:
     """Return the approval chain for a claim, or the reason it is blocked."""
     grade = claim["grade"]
     lines = claim["lines"]
-    over = [l for l in lines if l["amount"] > rules["category_limits"][l["category"]][grade]
-            and not l.get("exception_reason")]
+    over = [ln for ln in lines if ln["amount"] > rules["category_limits"][ln["category"]][grade]
+            and not ln.get("exception_reason")]
     if over:
         return {"blocked": f"{over[0]['category']} line above {grade} limit, needs exception reason"}
-    total = sum(l["amount"] for l in lines)
+    total = sum(ln["amount"] for ln in lines)
     tier = next(t for t in rules["approval_tiers"] if t["max_total"] is None or total <= t["max_total"])
     steps = list(tier["steps"])
-    if any(l.get("exception_reason") for l in lines) and rules["exception_approver"] not in steps:
+    if any(ln.get("exception_reason") for ln in lines) and rules["exception_approver"] not in steps:
         steps.append(rules["exception_approver"])
     chain = []
     for role in steps:

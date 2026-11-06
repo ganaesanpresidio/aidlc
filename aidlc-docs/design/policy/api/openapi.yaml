@@ -106,6 +106,7 @@ components:
         amount: {type: number, minimum: 0}
         currency: {type: string, pattern: "^[A-Z]{3}$"}
         quantity: {type: number, minimum: 0, description: "Nights, days or km for per-unit categories"}
+        amountInr: {type: number, minimum: 0, description: "INR equivalent, needed when currency is not INR (Q40)"}
         expenseDate: {type: string, format: date}
         hasReceipt: {type: boolean}
         exceptionReason: {type: string, maxLength: 500}
@@ -121,7 +122,7 @@ components:
       required: [lineId, code]
       properties:
         lineId: {type: string}
-        code: {type: string, enum: [LIMIT_EXCEEDED, RECEIPT_REQUIRED, WINDOW_EXPIRED, UNKNOWN_CATEGORY]}
+        code: {type: string, enum: [LIMIT_EXCEEDED, RECEIPT_REQUIRED, WINDOW_EXPIRED, FUTURE_DATE_EXPENSE, UNKNOWN_CATEGORY, INVALID_QUANTITY, MISSING_INR_EQUIVALENT]}
         limit: {type: number}
     EvaluateResult:
       type: object
@@ -136,6 +137,7 @@ components:
       required: [claimRef, submitter, grade, totalInr, requiresException, roleHolders]
       properties:
         claimRef: {type: string}
+        rulesVersion: {type: integer, minimum: 1, description: Route with the rules version used at submit. Defaults to the version in force today}
         submitter: {type: string, description: Opaque employee id}
         grade: {type: string}
         totalInr: {type: number, minimum: 0}
